@@ -1,0 +1,77 @@
+:root {
+    --primary-purple: #6B21A8;
+    --neon-pink: #EC4899;
+    --moon-silver: #F3F4F6;
+    --dark-night: #111827;
+    --glow-blue: #3B82F6;
+    --vibrant-orange: #F59E0B;
+}
+
+/* 品牌渐变 */
+.brand-gradient {
+    background: linear-gradient(135deg, var(--primary-purple), var(--neon-pink));
+}
+
+/* 基础重置 */
+body {
+    font-family: 'HarmonyOS Sans', '思源黑体', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* 盲盒卡片动效 */
+.box-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.box-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(107, 33, 168, 0.2);
+}
+
+/* 开盒动画 */
+@keyframes boxShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+.box-shake {
+    animation: boxShake 0.5s ease-in-out infinite;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .mobile-tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .main-content {
+        padding-bottom: 80px;
+    }
+}
+
+/* 加载动画 */
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-placeholder {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
