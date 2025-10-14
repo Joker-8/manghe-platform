@@ -17,7 +17,8 @@
               <div v-else class="logo-icon">🎁</div>
             </router-link>
             <p class="brand-description">
-              专业的盲盒销售与收藏平台，为您提供最优质的盲盒购物体验。
+              专业的盲盒销售与收藏平台<br>
+              为您提供最优质的盲盒购物体验
             </p>
           </div>
         </div>
@@ -101,13 +102,9 @@
 <script>
 import { ref, onMounted } from 'vue'
 
-// 尝试导入Logo图片
+// 直接使用public目录下的Logo
 let logoImport = null
-try {
-  logoImport = await import('@/assets/images/Logo.png')
-} catch (error) {
-  console.warn('Logo图片加载失败:', error)
-}
+let logoPath = '/images/Logo.png'
 
 export default {
   name: 'Footer',
@@ -120,18 +117,8 @@ export default {
     }
 
     onMounted(() => {
-      // 设置Logo图片
-      if (logoImport && logoImport.default) {
-        logoImage.value = logoImport.default
-      } else {
-        // 如果动态导入失败，尝试使用其他方式
-        try {
-          // 这里可以添加其他加载方式，比如使用公共路径
-          logoImage.value = '/images/Logo.png'
-        } catch {
-          console.warn('无法加载Logo图片')
-        }
-      }
+      // 直接设置Logo图片路径
+      logoImage.value = logoPath
     })
 
     return {

@@ -5,17 +5,19 @@
       <div class="col-lg-6 mb-4">
         <div class="product-gallery">
           <div class="main-image mb-3">
-            <img :src="product.image" :alt="product.name" class="img-fluid rounded">
-          </div>
+        <img :src="getProductImage(product.image)" :alt="product.name" class="img-fluid rounded" @error="handleImageError($event)" :data-loaded="false">
+      </div>
           <div class="image-thumbnails">
             <img
                 v-for="(img, index) in product.images"
                 :key="index"
-                :src="img"
+                :src="getProductImage(img)"
                 :alt="product.name"
                 class="thumbnail"
                 :class="{ active: currentImage === index }"
                 @click="currentImage = index"
+                @error="handleImageError($event)"
+                :data-loaded="false"
             >
           </div>
         </div>
@@ -28,11 +30,15 @@
           <div class="product-header mb-3">
             <div class="d-flex justify-content-between align-items-start">
               <h1 class="product-title">{{ product.name }}</h1>
-              <button class="btn btn-like" @click="toggleFavorite">
+              <button class="btn btn-like" @click="toggleFavorite" :title="isFavorited ? '从心愿单移除' : '加入心愿单'">
                 <i :class="['bi', isFavorited ? 'bi-heart-fill text-danger' : 'bi-heart']"></i>
+                <span class="favorite-count ms-1" v-if="favoritesCount > 0">{{ favoritesCount }}</span>
               </button>
             </div>
             <p class="product-series text-muted">{{ product.series }}</p>
+            <div v-if="showFavoriteMessage" class="favorite-message" :class="favoriteMessageType">
+              {{ favoriteMessage }}
+            </div>
           </div>
 
           <!-- 商品评分 -->
@@ -107,7 +113,7 @@
                 </button>
               </div>
               <div class="col-md-6">
-                <button class="btn btn-primary w-100" @click="buyNow" :disabled="!canBuy">
+                <button class="btn btn-primary w-100" @click="showBuyConfirmDialog = true" :disabled="!canBuy">
                   <i class="bi bi-lightning me-2"></i>立即购买
                 </button>
               </div>
@@ -220,6 +226,46 @@
       </div>
     </div>
   </div>
+
+  <!-- 购买确认弹窗 -->
+  <div v-if="showBuyConfirmDialog" class="dialog-overlay" @click.self="closeBuyDialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h5 class="dialog-title">确认购买</h5>
+        <button class="dialog-close" @click="closeBuyDialog">&times;</button>
+      </div>
+      
+      <div class="buy-info">
+        <div class="buy-product-name">{{ product.name }}</div>
+        <div v-if="selectedVariant" class="buy-variant mb-1">{{ selectedVariant.name }}</div>
+        <div class="buy-product-price">¥{{ selectedVariant?.price || product.price }}</div>
+        
+        <div class="buy-error" v-if="buyError">{{ buyError }}</div>
+        
+        <div class="quantity-selector">
+          <span class="quantity-label">购买数量：</span>
+          <div class="quantity-control">
+            <button class="quantity-btn" @click="decreaseBuyQuantity" :disabled="buyQuantity <= 1">&minus;</button>
+            <input type="number" class="quantity-input" v-model.number="buyQuantity" min="1" :max="maxQuantity">
+            <button class="quantity-btn" @click="increaseBuyQuantity" :disabled="buyQuantity >= maxQuantity">&plus;</button>
+          </div>
+        </div>
+        
+        <div class="buy-total">
+          <span>合计：</span>
+          <span class="text-primary">¥{{ (selectedVariant?.price || product.price) * buyQuantity }}</span>
+        </div>
+      </div>
+      
+      <div class="dialog-actions">
+        <button class="btn btn-cancel" @click="closeBuyDialog">取消</button>
+        <button class="btn btn-primary btn-confirm" @click="confirmBuy" :disabled="buyLoading || !canBuy">
+          <span v-if="buyLoading"><i class="bi bi-spinner bi-spin"></i> 处理中...</span>
+          <span v-else>确认购买</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -248,12 +294,12 @@ export default {
       id: 1,
       name: '星空幻想系列 - 银河守护者',
       series: '星空幻想系列 第一弹',
-      image: 'https://via.placeholder.com/600x600/6B21A8/FFFFFF?text=星空幻想',
+      image: '/images/box1.jpg',
       images: [
-        'https://via.placeholder.com/600x600/6B21A8/FFFFFF?text=星空幻想',
-        'https://via.placeholder.com/600x600/3B82F6/FFFFFF?text=侧面',
-        'https://via.placeholder.com/600x600/8B5CF6/FFFFFF?text=背面',
-        'https://via.placeholder.com/600x600/EC4899/FFFFFF?text=细节'
+        '/images/box1.jpg',
+        '/images/box2.jpg',
+        '/images/box3.jpg',
+        '/images/box4.jpg'
       ],
       price: 89,
       originalPrice: 99,
@@ -302,8 +348,8 @@ export default {
           content: '质量很好，开到了喜欢的款式！包装也很精美，还会继续购买这个系列。',
           date: '2024-01-15',
           images: [
-            'https://via.placeholder.com/100x100/6B21A8/FFFFFF?text=评价图1',
-            'https://via.placeholder.com/100x100/3B82F6/FFFFFF?text=评价图2'
+            '/images/box1.jpg',
+        '/images/box2.jpg'
           ]
         }
       ]
@@ -314,7 +360,7 @@ export default {
         id: 2,
         name: '森林物语系列',
         series: '季节限定',
-        image: 'https://via.placeholder.com/300x300/10B981/FFFFFF?text=森林物语',
+        image: '/images/box2.jpg',
         price: 79,
         rating: 4.6,
         stock: 89,
@@ -325,7 +371,7 @@ export default {
         id: 3,
         name: '海洋奇缘系列',
         series: '特别版',
-        image: 'https://via.placeholder.com/300x300/3B82F6/FFFFFF?text=海洋奇缘',
+        image: '/images/box3.jpg',
         price: 99,
         rating: 4.9,
         stock: 45,
@@ -338,17 +384,35 @@ export default {
     const isFavorited = computed(() => {
       return store.state.favorites.includes(product.id)
     })
+    
+    const favoritesCount = computed(() => {
+      return store.state.favorites.length
+    })
+    
+    const showFavoriteMessage = ref(false)
+    const favoriteMessage = ref('')
+    const favoriteMessageType = ref('success')
+    
+    // 购买确认弹窗相关状态
+    const showBuyConfirmDialog = ref(false)
+    const buyQuantity = ref(1)
+    const buyLoading = ref(false)
+    const buyError = ref('')
 
     const stockClass = computed(() => {
-      if (product.stock === 0) return 'bg-danger'
-      if (product.stock < 10) return 'bg-warning'
-      return 'bg-success'
+      const currentStock = selectedVariant.value?.stock || product.stock
+      if (currentStock === 0) return 'stock-out'
+      if (currentStock <= 5) return 'stock-low'
+      if (currentStock <= 20) return 'stock-medium'
+      return 'stock-high'
     })
 
     const stockText = computed(() => {
-      if (product.stock === 0) return '缺货'
-      if (product.stock < 10) return `仅剩 ${product.stock} 件`
-      return '有货'
+      const currentStock = selectedVariant.value?.stock || product.stock
+      if (currentStock === 0) return '已售罄'
+      if (currentStock <= 5) return `库存紧张: 仅剩${currentStock}个`
+      if (currentStock <= 20) return `库存适中: ${currentStock}个`
+      return `库存充足: ${currentStock}个`
     })
 
     const maxQuantity = computed(() => {
@@ -363,6 +427,39 @@ export default {
       return maxQuantity.value > 0
     })
 
+    // 处理图片加载错误，避免无限循环
+    const handleImageError = (event) => {
+      const target = event.target;
+      // 如果已经是默认图片或已经尝试过加载，则不再处理
+      if (target.src.includes('default-product.jpg') || target.dataset.loaded === 'true') {
+        return;
+      }
+      console.error('图片加载失败:', target.src);
+      // 标记已经尝试过加载
+      target.dataset.loaded = 'true';
+      // 使用默认图片
+      target.src = '/images/default-product.jpg';
+    }
+    
+    // 获取正确的商品图片路径
+    const getProductImage = (imagePath) => {
+      if (!imagePath) {
+        return '/images/default-product.jpg';
+      }
+      
+      // 如果只有文件名，添加正确的路径前缀
+      if (typeof imagePath === 'string' && !imagePath.startsWith('/images/')) {
+        // 只对box1.jpg使用boxes子目录，其他box图片直接放在images根目录
+        if (imagePath === 'box1.jpg') {
+          imagePath = '/images/boxes/' + imagePath;
+        } else {
+          imagePath = '/images/' + imagePath;
+        }
+      }
+      
+      return imagePath;
+    }
+    
     // 方法
     const selectVariant = (variant) => {
       selectedVariant.value = variant
@@ -382,20 +479,40 @@ export default {
       }
     }
 
-    const toggleFavorite = () => {
+    const toggleFavorite = async () => {
       if (!store.getters.isLoggedIn) {
         router.push('/login')
         return
       }
 
-      if (isFavorited.value) {
-        store.commit('REMOVE_FAVORITE', product.id)
-      } else {
-        store.commit('ADD_FAVORITE', product.id)
+      try {
+        if (isFavorited.value) {
+          await store.dispatch('removeFavorite', product.id)
+          favoriteMessage.value = '已从心愿单移除'
+          favoriteMessageType.value = 'warning'
+        } else {
+          await store.dispatch('addFavorite', product.id)
+          favoriteMessage.value = '已添加到心愿单'
+          favoriteMessageType.value = 'success'
+        }
+        
+        // 显示提示信息
+        showFavoriteMessage.value = true
+        setTimeout(() => {
+          showFavoriteMessage.value = false
+        }, 2000)
+      } catch (error) {
+        console.error('心愿单操作失败:', error)
+        favoriteMessage.value = '操作失败，请稍后重试'
+        favoriteMessageType.value = 'error'
+        showFavoriteMessage.value = true
+        setTimeout(() => {
+          showFavoriteMessage.value = false
+        }, 2000)
       }
     }
 
-    const addToCart = () => {
+    const addToCart = async () => {
       if (!store.getters.isLoggedIn) {
         router.push('/login')
         return
@@ -406,53 +523,137 @@ export default {
         return
       }
 
-      const cartItem = {
-        productId: product.id,
-        variantId: selectedVariant.value?.id,
-        name: product.name,
-        image: product.image,
-        price: selectedVariant.value?.price || product.price,
-        quantity: quantity.value,
-        stock: maxQuantity.value
-      }
+      try {
+        const cartItem = {
+          productId: product.id,
+          variantId: selectedVariant.value?.id,
+          name: product.name,
+          image: product.image,
+          price: selectedVariant.value?.price || product.price,
+          quantity: quantity.value,
+          stock: maxQuantity.value
+        }
 
-      store.dispatch('addToCart', cartItem)
-      alert('已添加到购物车！')
+        // 检查库存是否足够
+        if (cartItem.quantity > cartItem.stock) {
+          alert('库存不足，当前库存：' + cartItem.stock)
+          return
+        }
+
+        await store.dispatch('addToCart', cartItem)
+        alert('已添加到购物车！')
+      } catch (error) {
+        console.error('添加购物车失败:', error)
+        alert('添加购物车失败，请稍后重试')
+      }
     }
 
-    const buyNow = () => {
+    const increaseBuyQuantity = () => {
+      if (buyQuantity.value < maxQuantity.value) {
+        buyQuantity.value++
+        buyError.value = ''
+      }
+    }
+
+    const decreaseBuyQuantity = () => {
+      if (buyQuantity.value > 1) {
+        buyQuantity.value--
+        buyError.value = ''
+      }
+    }
+
+    const closeBuyDialog = () => {
+      showBuyConfirmDialog.value = false
+      buyQuantity.value = 1
+      buyError.value = ''
+    }
+
+    const confirmBuy = async () => {
       if (!store.getters.isLoggedIn) {
         router.push('/login')
         return
       }
 
-      if (!canBuy.value) {
-        alert('商品已售罄')
+      // 检查库存
+      if (buyQuantity.value > maxQuantity.value) {
+        buyError.value = '库存不足'
         return
       }
 
-      // 直接跳转到订单确认页面
-      const orderItems = [{
-        productId: product.id,
-        variantId: selectedVariant.value?.id,
-        name: product.name,
-        image: product.image,
-        price: selectedVariant.value?.price || product.price,
-        quantity: quantity.value
-      }]
-
-      console.log('立即购买:', orderItems)
-      alert('跳转到订单确认页面...')
+      buyLoading.value = true
+      try {
+        // 调用store中的createOrder action
+        const result = await store.dispatch('createOrder', {
+          productId: product.id,
+          quantity: buyQuantity.value
+        })
+        
+        if (result.success) {
+          // 订单创建成功后关闭弹窗
+          closeBuyDialog()
+          
+          // 跳转到订单详情页面
+          router.push({
+            name: 'orderDetail',
+            params: { id: result.data.id }
+          })
+          
+          // 可选：更新本地商品库存状态
+          if (selectedVariant.value) {
+            selectedVariant.value.stock -= buyQuantity.value
+          } else {
+            product.stock -= buyQuantity.value
+          }
+        } else {
+          // 处理错误消息
+          if (result.message.includes('登录')) {
+            router.push('/login')
+          } else if (result.message.includes('库存')) {
+            buyError.value = result.message
+          } else {
+            buyError.value = result.message || '订单创建失败，请稍后重试'
+          }
+        }
+      } catch (error) {
+        console.error('购买失败:', error)
+        // 网络异常处理
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          buyError.value = '网络连接异常，请检查网络设置'
+        } else if (error.name === 'AbortError') {
+          buyError.value = '请求已取消'
+        } else {
+          buyError.value = '系统错误，请稍后重试'
+        }
+        
+        // 显示具体错误信息（开发环境下）
+        if (process.env.NODE_ENV === 'development') {
+          console.error('详细错误:', error)
+        }
+      } finally {
+        buyLoading.value = false
+      }
     }
 
     onMounted(() => {
       // 模拟加载商品数据
       Object.assign(product, mockProduct)
       // 默认选择第一个有库存的变体
-      if (product.variants && product.variants.length) {
-        const availableVariant = product.variants.find(v => v.stock > 0)
-        selectedVariant.value = availableVariant || product.variants[0]
-      }
+        if (product.variants && product.variants.length) {
+          const availableVariant = product.variants.find(v => v.stock > 0)
+          selectedVariant.value = availableVariant || product.variants[0]
+        }
+        
+        // 监听网络状态变化
+        window.addEventListener('online', () => {
+          // 网络恢复时可以添加提示
+        })
+        
+        window.addEventListener('offline', () => {
+          // 网络断开时显示提示
+          if (process.env.NODE_ENV === 'development') {
+            console.log('网络连接已断开')
+          }
+        })
     })
 
     return {
@@ -461,7 +662,17 @@ export default {
       selectedVariant,
       quantity,
       relatedProducts,
+      handleImageError,
+      getProductImage,
       isFavorited,
+      favoritesCount,
+      showFavoriteMessage,
+      favoriteMessage,
+      favoriteMessageType,
+      showBuyConfirmDialog,
+      buyQuantity,
+      buyLoading,
+      buyError,
       stockClass,
       stockText,
       maxQuantity,
@@ -470,9 +681,12 @@ export default {
       selectVariant,
       increaseQuantity,
       decreaseQuantity,
+      increaseBuyQuantity,
+      decreaseBuyQuantity,
       toggleFavorite,
       addToCart,
-      buyNow
+      closeBuyDialog,
+      confirmBuy
     }
   }
 }
@@ -525,11 +739,57 @@ export default {
   font-size: 1.5rem;
   color: #6c757d;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
 }
 
 .btn-like:hover {
   color: var(--neon-pink);
   transform: scale(1.1);
+}
+
+.favorite-count {
+  background-color: var(--primary-purple);
+  color: white;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.favorite-message {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.9rem;
+  z-index: 10;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+.favorite-message.success {
+  background-color: var(--success-color, #198754);
+}
+
+.favorite-message.warning {
+  background-color: var(--warning-color, #ffc107);
+  color: #212529;
+}
+
+.favorite-message.error {
+  background-color: var(--danger-color, #dc3545);
+  color: white;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -10px); }
+  20% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, 10px); }
 }
 
 .current-price {
@@ -543,6 +803,25 @@ export default {
 
 .discount-badge {
   font-size: 0.875rem;
+}
+
+/* 库存状态样式 */
+.stock-high {
+  color: var(--success-color, #198754);
+}
+
+.stock-medium {
+  color: var(--warning-color, #ffc107);
+}
+
+.stock-low {
+  color: var(--danger-color, #dc3545);
+  font-weight: bold;
+}
+
+.stock-out {
+  color: #6c757d;
+  text-decoration: line-through;
 }
 
 .variant-options .btn.active {
@@ -610,6 +889,280 @@ export default {
 
   .product-actions .btn {
     margin-bottom: 0.5rem;
+    flex: 1;
+  }
+  
+  .favorite-message {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    width: 100%;
+    left: 0;
+    transform: none;
+    text-align: center;
+  }
+  
+  .quantity-controls {
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .quantity-controls .form-control {
+    width: 60px;
+  }
+}
+
+/* 购买确认弹窗样式 */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: dialogSlideIn 0.3s ease-out;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.dialog-close:hover {
+  color: #333;
+}
+
+.buy-info {
+  margin-bottom: 1.5rem;
+}
+
+.buy-product-name {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.buy-variant {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.buy-product-price {
+  color: var(--primary-purple);
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.buy-error,
+.error-message {
+  color: #dc3545;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  padding: 0.75rem;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.quantity-label {
+  margin-right: 1rem;
+  font-weight: 500;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.quantity-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #6c757d;
+  transition: all 0.3s ease;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background-color: #f8f9fa;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-input {
+  width: 60px;
+  text-align: center;
+  border: none;
+  font-size: 1rem;
+}
+
+.quantity-input:focus {
+  outline: none;
+}
+
+.buy-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-cancel {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-cancel:hover {
+  background-color: #e9ecef;
+}
+
+.btn-confirm:disabled,
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: all;
+}
+
+/* 加载状态样式 */
+.btn-loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  margin-left: -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.btn-confirm.btn-loading::after {
+  border-top-color: white;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes dialogSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 576px) {
+  .dialog-content {
+    padding: 1.5rem;
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+  
+  .dialog-actions {
+    flex-direction: column;
+  }
+  
+  .dialog-actions .btn {
+    width: 100%;
+    padding: 0.75rem;
+  }
+  
+  .quantity-selector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .quantity-label {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .quantity-control {
+    justify-content: center;
+  }
+  
+  .quantity-input {
+    width: 80px;
+  }
+  
+  .buy-total {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
 </style>

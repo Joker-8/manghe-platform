@@ -8,6 +8,7 @@ import Collection from '@/views/collection/Collection.vue'
 import Community from '@/views/community/Community.vue'
 import Profile from '@/views/user/Profile.vue'
 import Orders from '@/views/user/Orders.vue'
+import OrderDetail from '@/views/user/OrderDetail.vue'
 import Settings from '@/views/user/Settings.vue'
 import About from '@/views/common/About.vue'
 import OpenBox from '@/views/open/OpenBox.vue'
@@ -63,6 +64,13 @@ const routes = [
         path: '/orders',
         name: 'orders',
         component: Orders,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/orders/:id',
+        name: 'orderDetail',
+        component: OrderDetail,
+        props: true,
         meta: { requiresAuth: true }
     },
     {

@@ -281,10 +281,10 @@ export default {
       { name: '盲盒交换', count: 54, trend: 'up' }
     ])
     const activeUsers = ref([
-      { id: 2, name: '盲盒达人', avatar: 'https://via.placeholder.com/40x40/3B82F6/FFFFFF?text=用户', posts: 24 },
-      { id: 3, name: '收藏家小明', avatar: 'https://via.placeholder.com/40x40/10B981/FFFFFF?text=用户', posts: 18 },
-      { id: 4, name: '开盒幸运星', avatar: 'https://via.placeholder.com/40x40/EC4899/FFFFFF?text=用户', posts: 15 },
-      { id: 5, name: '系列控', avatar: 'https://via.placeholder.com/40x40/F59E0B/FFFFFF?text=用户', posts: 12 }
+      { id: 2, name: '盲盒达人', avatar: '/images/Logo.png', posts: 24 },
+        { id: 3, name: '收藏家小明', avatar: '/images/Logo.png', posts: 18 },
+        { id: 4, name: '开盒幸运星', avatar: '/images/Logo.png', posts: 15 },
+        { id: 5, name: '系列控', avatar: '/images/Logo.png', posts: 12 }
     ])
 
     const emojis = ref(['😊', '😂', '🥰', '😍', '🤩', '😎', '🤗', '👍', '🎉', '❤️', '🔥', '⭐', '🎁', '🤞'])
@@ -485,13 +485,13 @@ export default {
             user: {
               id: 2,
               name: '盲盒达人',
-              avatar: 'https://via.placeholder.com/40x40/3B82F6/FFFFFF?text=用户',
+              avatar: '/images/Logo.png',
               level: '钻石会员',
               isFollowing: true
             },
             content: '今天开到了隐藏款！太幸运了！🎉 这个系列的做工真的很精致，推荐大家收藏！#开箱分享 #隐藏款展示',
             images: [
-              'https://via.placeholder.com/400x300/6B21A8/FFFFFF?text=隐藏款'
+              '/images/box1.jpg'
             ],
             topic: '开箱分享',
             likes: 24,
@@ -503,7 +503,7 @@ export default {
             commentsList: [
               {
                 id: 1,
-                user: { name: '收藏家小明', avatar: 'https://via.placeholder.com/32x32/10B981/FFFFFF?text=用户' },
+                user: { name: '收藏家小明', avatar: '/images/Logo.png' },
                 content: '太羡慕了！我也想要这个隐藏款！',
                 createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString()
               }
@@ -514,14 +514,14 @@ export default {
             user: {
               id: 3,
               name: '收藏家小明',
-              avatar: 'https://via.placeholder.com/40x40/10B981/FFFFFF?text=用户',
+              avatar: '/images/Logo.png',
               level: '黄金会员',
               isFollowing: false
             },
             content: '这个系列的做工真的很精致，每个细节都很完美。已经收集齐全套了！🥰 #收藏心得 #新品评测',
             images: [
-              'https://via.placeholder.com/400x300/10B981/FFFFFF?text=全套收藏',
-              'https://via.placeholder.com/400x300/F59E0B/FFFFFF?text=细节展示'
+              '/images/box2.jpg',
+          '/images/box3.jpg'
             ],
             topic: '收藏心得',
             likes: 15,

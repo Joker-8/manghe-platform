@@ -11,19 +11,13 @@
         >
       </router-link>
 
-      <!-- 搜索框 -->
+      <!-- 高级搜索框 -->
       <div class="search-container mx-3 flex-grow-1" v-if="!isMobile">
-        <div class="input-group">
-          <input
-              type="text"
-              class="form-control"
-              placeholder="搜索盲盒系列..."
-              v-model="searchKeyword"
-          >
-          <button class="btn btn-light" type="button">
-            <i class="bi bi-search"></i>
-          </button>
-        </div>
+        <AdvancedSearch 
+          placeholder="搜索盲盒名称或系列..."
+          :items="searchItems"
+          @search="handleSearch"
+        />
       </div>
 
       <!-- 导航链接 -->
@@ -34,11 +28,11 @@
 
         <!-- 用户相关 -->
         <div class="nav-item dropdown" v-if="isLoggedIn">
-          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-            <img :src="avatar" class="user-avatar rounded-circle me-2" alt="头像" @error="handleAvatarError">
-            <span>{{ username }}</span>
+          <a class="nav-link d-flex align-items-center position-relative" href="#" role="button">
+            <img :src="avatar" class="user-avatar rounded-circle" alt="头像" @error="handleAvatarError">
           </a>
           <ul class="dropdown-menu">
+            <li class="dropdown-item disabled">{{ nickname }}</li>
             <li><router-link class="dropdown-item" to="/profile">个人中心</router-link></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item text-danger" @click="handleLogout">退出登录</a></li>
@@ -55,17 +49,61 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import AdvancedSearch from '@/components/common/AdvancedSearch.vue'
 
 // 直接导入图片
-import logoImage from '@/assets/images/Logo.png'
+// 使用public目录下的Logo
+const logoImage = '/images/Logo.png'
+
+// 模拟商品数据，用于搜索建议
+const mockBoxes = [
+  {
+    id: 1,
+    name: '星空幻想盲盒',
+    series: '星空幻想系列'
+  },
+  {
+    id: 2,
+    name: '森林精灵盲盒',
+    series: '森林物语系列'
+  },
+  {
+    id: 3,
+    name: '海洋探险盲盒',
+    series: '海洋探险系列'
+  },
+  {
+    id: 4,
+    name: '城市霓虹盲盒',
+    series: '城市霓虹系列'
+  },
+  {
+    id: 5,
+    name: '童话梦境盲盒',
+    series: '童话梦境系列'
+  },
+  {
+    id: 6,
+    name: '复古经典盲盒',
+    series: '复古经典系列'
+  },
+  {
+    id: 7,
+    name: '夏日限定盲盒',
+    series: '夏日限定系列'
+  }
+]
 
 export default {
   name: 'NavBar',
+  components: {
+    AdvancedSearch
+  },
   setup() {
-    const searchKeyword = ref('')
+    const searchItems = ref([])
     const store = useStore()
     const router = useRouter()
     const route = useRoute()
@@ -73,6 +111,7 @@ export default {
     const isMobile = computed(() => window.innerWidth <= 768)
     const isLoggedIn = computed(() => store.getters.isLoggedIn)
     const username = computed(() => store.getters.username || '用户')
+    const nickname = computed(() => store.getters.nickname)
     const avatar = computed(() => store.getters.avatar || getDefaultAvatar())
 
     // 检查是否需要隐藏导航栏
@@ -101,19 +140,37 @@ export default {
       store.dispatch('logout')
       router.push('/')
     }
+    
+    const handleSearch = (keyword) => {
+      console.log('搜索关键词:', keyword)
+      // 搜索逻辑已在组件内部处理
+    }
+    
+    // 加载搜索数据
+    const loadSearchData = () => {
+      // 实际项目中这里应该从API获取商品数据
+      // 现在使用模拟数据
+      searchItems.value = [...mockBoxes]
+    }
+    
+    onMounted(() => {
+      loadSearchData()
+    })
 
     return {
-      searchKeyword,
+      searchItems,
       isMobile,
       isLoggedIn,
       username,
+      nickname,
       avatar,
       logoImage,
       imageError,
       shouldHideNav,
       handleImageError,
       handleAvatarError,
-      handleLogout
+      handleLogout,
+      handleSearch
     }
   }
 }
@@ -135,6 +192,36 @@ export default {
   width: 32px;
   height: 32px;
   object-fit: cover;
+  cursor: pointer;
+}
+
+/* 默认情况下（桌面端）实现鼠标悬停显示下拉菜单 */
+.dropdown:hover .dropdown-menu {
+  display: block;
+  margin-top: 0;
+}
+
+/* 确保下拉菜单正常显示 */
+.dropdown-menu {
+  margin-top: 0.5rem;
+}
+
+/* 桌面端强制使用悬停显示 */
+@media (min-width: 769px) {
+  .dropdown-menu {
+    display: none;
+  }
+  
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+}
+
+/* 昵称显示样式 */
+.dropdown-item:disabled {
+  color: #6c757d;
+  background-color: transparent;
+  font-weight: 500;
 }
 
 .search-container {
@@ -159,6 +246,11 @@ export default {
 
   .search-container {
     max-width: 200px;
+  }
+  
+  /* 移动端移除悬停效果，保持点击交互 */
+  .dropdown:hover .dropdown-menu {
+    display: none;
   }
 }
 </style>

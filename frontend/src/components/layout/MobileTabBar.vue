@@ -25,16 +25,17 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // 导入底部导航栏图标图片
-import homeIcon from '@/assets/images/tab-icons/home.png'
-import homeActiveIcon from '@/assets/images/tab-icons/home-active.png'
-import shopIcon from '@/assets/images/tab-icons/shop.png'
-import shopActiveIcon from '@/assets/images/tab-icons/shop-active.png'
-import openIcon from '@/assets/images/tab-icons/open.png'
-import openActiveIcon from '@/assets/images/tab-icons/open-active.png'
-import communityIcon from '@/assets/images/tab-icons/community.png'
-import communityActiveIcon from '@/assets/images/tab-icons/community-active.png'
-import profileIcon from '@/assets/images/tab-icons/profile.png'
-import profileActiveIcon from '@/assets/images/tab-icons/profile-active.png'
+// 使用public目录下的图标资源
+const homeIcon = '/images/tab-icons/home.png'
+const homeActiveIcon = '/images/tab-icons/home-active.png'
+const shopIcon = '/images/tab-icons/shop.png'
+const shopActiveIcon = '/images/tab-icons/shop-active.png'
+const openIcon = '/images/tab-icons/open.png'
+const openActiveIcon = '/images/tab-icons/open-active.png'
+const communityIcon = '/images/tab-icons/community.png'
+const communityActiveIcon = '/images/tab-icons/community-active.png'
+const profileIcon = '/images/tab-icons/profile.png'
+const profileActiveIcon = '/images/tab-icons/profile-active.png'
 
 export default {
   name: 'MobileTabBar',

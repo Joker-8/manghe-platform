@@ -11,8 +11,7 @@
                 alt="用户头像"
                 @error="handleAvatarError"
             >
-            <h4>{{ userInfo.name }}</h4>
-            <p class="text-muted">@{{ userInfo.username }}</p>
+            <h4>{{ userInfo.nickname || '用户' }}</h4>
 
             <!-- 会员等级 -->
             <div class="membership-level mb-3">
@@ -33,7 +32,8 @@
                 <small class="text-muted">动态</small>
               </div>
             </div>
-            <button class="btn btn-outline-primary w-100" @click="editProfile">编辑资料</button>
+            <button class="btn btn-outline-primary w-100 mb-2" @click="editProfile">编辑资料</button>
+            <button class="btn btn-danger w-100" @click="showDeleteModal = true">申请注销账号</button>
           </div>
         </div>
 
@@ -131,11 +131,17 @@
                   <tr v-for="order in recentOrders" :key="order.id">
                     <td>#{{ order.id }}</td>
                     <td>
-                      <div class="d-flex align-items-center">
-                        <img :src="order.productImage" :alt="order.product" class="order-product-image me-2">
-                        <span>{{ order.product }}</span>
-                      </div>
-                    </td>
+                        <div class="d-flex align-items-center">
+                          <img 
+                            :src="getProductImage(order)" 
+                            :alt="order.product || '商品图片'" 
+                            class="order-product-image me-2"
+                            @error="handleImageError($event)"
+                            :data-loaded="false"
+                          >
+                          <span>{{ order.product }}</span>
+                        </div>
+                      </td>
                     <td>¥{{ order.amount }}</td>
                     <td>
                       <span :class="`badge bg-${getStatusClass(order.status)}`">
@@ -180,17 +186,57 @@
         </div>
       </div>
     </div>
+
+    <!-- 注销确认模态框 -->
+    <div v-if="showDeleteModal" class="modal fade show" tabindex="-1" role="dialog" style="display: block">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">确认注销账号</h5>
+            <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-danger mb-3">
+              <strong>警告：</strong>账号注销后将无法恢复，所有数据将在7天冷静期后被永久删除。
+            </div>
+            <div class="form-group">
+              <label for="confirmText">请输入"确认注销"以继续：</label>
+              <input 
+                id="confirmText" 
+                v-model="confirmText" 
+                type="text" 
+                class="form-control" 
+                placeholder="请输入确认文本"
+              >
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showDeleteModal = false">取消</button>
+            <button 
+              type="button" 
+              class="btn btn-danger" 
+              @click="submitDeleteRequest"
+              :disabled="deletingAccount"
+            >
+              {{ deletingAccount ? '处理中...' : '确认注销' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'ProfilePage',
   setup() {
     const store = useStore()
+    const router = useRouter()
 
     const userInfo = ref({})
     const recentOrders = ref([])
@@ -215,8 +261,47 @@ export default {
       return Math.min((current / nextLevelPoints) * 100, 100) + '%'
     })
 
-    // 模拟数据
+    // 处理图片加载错误
+    // 处理图片加载错误，避免无限循环
+    const handleImageError = (event) => {
+      const target = event.target;
+      // 如果已经是默认图片或已经尝试过加载，则不再处理
+      if (target.src.includes('default-product.jpg') || target.dataset.loaded === 'true') {
+        return;
+      }
+      console.error('图片加载失败:', target.src);
+      // 标记已经尝试过加载
+      target.dataset.loaded = 'true';
+      // 使用默认图片
+      target.src = '/images/default-product.jpg';
+    }
+    
+    // 获取正确的商品图片路径
+    const getProductImage = (order) => {
+      let imagePath = order.productImage || order.product_image || '';
+      
+      // 处理不同的数据格式
+      if (!imagePath && typeof order === 'object') {
+        // 从order对象中提取图片信息
+        imagePath = order.image || order.img || order.picture || '';
+      }
+      
+      // 如果只有文件名，添加正确的路径前缀
+      if (imagePath && !imagePath.startsWith('/images/')) {
+        // 只对box1.jpg使用boxes子目录，其他box图片直接放在images根目录
+        if (imagePath === 'box1.jpg') {
+          imagePath = '/images/boxes/' + imagePath;
+        } else {
+          imagePath = '/images/' + imagePath;
+        }
+      }
+      
+      return imagePath || '/images/default-product.jpg';
+    }
+
+    // 模拟数据 - 仅用于测试用户
     const mockUserInfo = {
+      nickname: '盲盒爱好者',
       name: '盲盒爱好者',
       username: 'boxlover',
       followers: 128,
@@ -231,21 +316,21 @@ export default {
       {
         id: '20240115001',
         product: '星空幻想系列',
-        productImage: 'https://via.placeholder.com/40x40/6B21A8/FFFFFF?text=盒',
+        productImage: '/images/box1.jpg',
         amount: 89,
         status: '已完成'
       },
       {
         id: '20240114002',
         product: '森林物语系列',
-        productImage: 'https://via.placeholder.com/40x40/10B981/FFFFFF?text=盒',
+        productImage: '/images/box2.jpg',
         amount: 79,
         status: '已发货'
       },
       {
         id: '20240113003',
         product: '海洋奇缘系列',
-        productImage: 'https://via.placeholder.com/40x40/3B82F6/FFFFFF?text=盒',
+        productImage: '/images/box3.jpg',
         amount: 99,
         status: '待付款'
       }
@@ -270,6 +355,10 @@ export default {
       { id: 3, name: '开盒高手', icon: 'bi-gift', unlocked: false },
       { id: 4, name: '社区明星', icon: 'bi-star', unlocked: true }
     ]
+    
+    // 测试用户标识（用于显示模拟数据）
+    const TEST_USERNAME = 'C01';
+    const isTestUser = (username) => username === TEST_USERNAME;
 
     const getStatusClass = (status) => {
       const classes = {
@@ -287,28 +376,107 @@ export default {
     }
 
     const editProfile = () => {
-      // 编辑资料逻辑
-      console.log('编辑资料')
+      // 导航到设置页面的基本信息标签
+      router.push('/settings')
+      // 存储要激活的标签页到sessionStorage，以便Settings组件可以读取
+      sessionStorage.setItem('activeTab', 'profile')
+    }
+
+    // 注销账号相关状态和方法
+    const showDeleteModal = ref(false)
+    const confirmText = ref('')
+    const deletingAccount = ref(false)
+    const deleteStatus = ref('')
+
+    const submitDeleteRequest = async () => {
+      if (confirmText.value !== '确认注销') {
+        alert('请输入正确的确认文本')
+        return
+      }
+
+      try {
+        deletingAccount.value = true
+        // 获取当前用户ID
+        const userId = store.state.user.id
+        // 调用注销API
+        const response = await fetch(`/api/users/${userId}/delete-request`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${store.state.token}`
+          },
+          body: JSON.stringify({})
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          // 设置7天冷静期
+          const 冷静期天数 = 7
+          deleteStatus.value = `账号注销申请已提交，将在${冷静期天数}天后生效`
+          showDeleteModal.value = false
+          alert('账号注销申请已提交，请在7天冷静期内考虑是否取消注销')
+        } else {
+          const error = await response.json()
+          console.error('注销申请失败:', error)
+          alert('注销申请失败，请稍后重试')
+        }
+      } catch (error) {
+        console.error('提交注销申请时出错:', error)
+        alert('网络错误，请稍后重试')
+      } finally {
+        deletingAccount.value = false
+        confirmText.value = ''
+      }
     }
 
     onMounted(() => {
       // 如果store中有用户信息，使用store中的数据
       if (store.state.user) {
+        // 基础用户信息始终从store获取
         userInfo.value = {
-          ...mockUserInfo,
-          name: store.state.user.username || mockUserInfo.name,
-          username: store.state.user.username || mockUserInfo.username,
-          points: store.state.user.points || mockUserInfo.points,
-          level: store.state.user.level || mockUserInfo.level
+          nickname: store.state.user.nickname || '',
+          name: store.state.user.name || store.state.user.username || '',
+          username: store.state.user.username || '',
+          followers: store.state.user.followers || 0,
+          following: store.state.user.following || 0,
+          posts: store.state.user.posts || 0,
+          points: store.state.user.points || 0,
+          level: store.state.user.level || '普通会员',
+          nextLevel: store.state.user.nextLevel || '白银会员'
+        }
+        
+        // 只有测试用户才使用模拟数据
+        const username = store.state.user.username || '';
+        if (isTestUser(username)) {
+          recentOrders.value = mockOrders;
+          activities.value = mockActivities;
+          stats.value = mockStats;
+          achievements.value = mockAchievements;
+        } else {
+          // 非测试用户使用空数据或从store获取
+          recentOrders.value = store.state.orders || [];
+          activities.value = store.state.activities || [];
+          stats.value = store.state.stats || { totalBoxes: 0, collections: 0, communityPosts: 0 };
+          achievements.value = store.state.achievements || [];
         }
       } else {
-        userInfo.value = mockUserInfo
+        // 未登录状态显示空数据
+        userInfo.value = {
+          nickname: '',
+          name: '',
+          username: '',
+          followers: 0,
+          following: 0,
+          posts: 0,
+          points: 0,
+          level: '普通会员',
+          nextLevel: '白银会员'
+        }
+        recentOrders.value = []
+        activities.value = []
+        stats.value = { totalBoxes: 0, collections: 0, communityPosts: 0 }
+        achievements.value = []
       }
-
-      recentOrders.value = mockOrders
-      activities.value = mockActivities
-      stats.value = mockStats
-      achievements.value = mockAchievements
     })
 
     return {
@@ -319,9 +487,16 @@ export default {
       achievements,
       userAvatar,
       progressWidth,
+      handleImageError,
       getStatusClass,
       handleAvatarError,
-      editProfile
+      editProfile,
+      showDeleteModal,
+      confirmText,
+      deletingAccount,
+      deleteStatus,
+      submitDeleteRequest,
+      getProductImage
     }
   }
 }

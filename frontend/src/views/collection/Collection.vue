@@ -52,10 +52,20 @@
           </div>
         </div>
 
-        <!-- 视图切换 -->
+        <!-- 视图切换和同步控制 -->
         <div class="view-controls mb-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <h4>我的收藏</h4>
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <h4 class="mb-0">我的收藏</h4>
+              <button 
+                v-if="store.getters.isLoggedIn" 
+                class="btn btn-sm btn-outline-secondary" 
+                @click="syncCollections" 
+                :disabled="loading"
+              >
+                <i class="bi bi-arrow-clockwise"></i> {{ loading ? '同步中...' : '同步数据' }}
+              </button>
+            </div>
             <div class="btn-group">
               <button
                   class="btn"
@@ -272,11 +282,15 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default {
   name: 'CollectionPage',
   setup() {
+    // 响应式数据
     const collections = ref([])
     const viewMode = ref('grid')
     const rotationY = ref(0)
@@ -284,64 +298,21 @@ export default {
     const autoRotate = ref(false)
     const selectedExhibit = ref(null)
     const galleryContainer = ref(null)
+    const loading = ref(false)
+    const store = useStore()
+    const router = useRouter()
 
-    // 模拟收藏数据
-    const mockCollections = [
-      {
-        id: 1,
-        name: '星空幻想 - 隐藏款',
-        series: '星空幻想系列',
-        image: 'https://via.placeholder.com/200x200/6B21A8/FFFFFF?text=隐藏款',
-        rarity: '隐藏',
-        acquiredDate: '2024-01-15',
-        description: '极其稀有的隐藏款式，拥有独特的星空特效'
-      },
-      {
-        id: 2,
-        name: '森林物语 - 普通款',
-        series: '森林物语系列',
-        image: 'https://via.placeholder.com/200x200/10B981/FFFFFF?text=普通款',
-        rarity: '普通',
-        acquiredDate: '2024-01-10',
-        description: '经典的森林主题款式'
-      },
-      {
-        id: 3,
-        name: '海洋奇缘 - 稀有款',
-        series: '海洋奇缘系列',
-        image: 'https://via.placeholder.com/200x200/3B82F6/FFFFFF?text=稀有款',
-        rarity: '稀有',
-        acquiredDate: '2024-01-08',
-        description: '带有海洋波纹特效的稀有款式'
-      },
-      {
-        id: 4,
-        name: '城市探险 - 史诗款',
-        series: '城市探险系列',
-        image: 'https://via.placeholder.com/200x200/8B5CF6/FFFFFF?text=史诗款',
-        rarity: '史诗',
-        acquiredDate: '2024-01-05',
-        description: '展现城市风貌的史诗级收藏品'
-      },
-      {
-        id: 5,
-        name: '夏日限定 - 传说款',
-        series: '夏日限定系列',
-        image: 'https://via.placeholder.com/200x200/F59E0B/FFFFFF?text=传说款',
-        rarity: '传说',
-        acquiredDate: '2024-01-03',
-        description: '夏季限定的传说级收藏品'
-      },
-      {
-        id: 6,
-        name: '复古经典 - 普通款',
-        series: '复古经典系列',
-        image: 'https://via.placeholder.com/200x200/6B7280/FFFFFF?text=普通款',
-        rarity: '普通',
-        acquiredDate: '2024-01-01',
-        description: '怀旧风格的经典款式'
+    // 方法
+    const getRarityClass = (rarity) => {
+      const classes = {
+        '隐藏': 'bg-danger',
+        '传说': 'bg-warning',
+        '史诗': 'bg-purple',
+        '稀有': 'bg-info',
+        '普通': 'bg-secondary'
       }
-    ]
+      return classes[rarity] || 'bg-secondary'
+    }
 
     // 计算属性
     const totalCollections = computed(() => collections.value.length)
@@ -375,18 +346,6 @@ export default {
             .map(item => ({ ...item, rarity: item.rarity.toLowerCase() }))
     )
 
-    // 方法
-    const getRarityClass = (rarity) => {
-      const classes = {
-        '隐藏': 'bg-danger',
-        '传说': 'bg-warning',
-        '史诗': 'bg-purple',
-        '稀有': 'bg-info',
-        '普通': 'bg-secondary'
-      }
-      return classes[rarity] || 'bg-secondary'
-    }
-
     const rotateGallery = (direction) => {
       if (direction === 'left') {
         rotationY.value -= 90
@@ -412,16 +371,24 @@ export default {
     }
 
     // 自动旋转逻辑
+    let autoRotateInterval = null
     watch(autoRotate, (newVal) => {
+      if (autoRotateInterval) {
+        clearInterval(autoRotateInterval)
+      }
       if (newVal) {
-        const interval = setInterval(() => {
+        autoRotateInterval = setInterval(() => {
           rotationY.value += 1
         }, 50)
-
-        // 清理函数
-        return () => clearInterval(interval)
       }
     })
+
+    // 组件卸载时清理
+    const cleanup = () => {
+      if (autoRotateInterval) {
+        clearInterval(autoRotateInterval)
+      }
+    }
 
     // 拖拽旋转逻辑
     const setupDragRotation = () => {
@@ -467,14 +434,216 @@ export default {
       }
     }
 
-    onMounted(() => {
-      // 模拟加载数据
-      setTimeout(() => {
-        collections.value = mockCollections
-      }, 500)
+    // 从服务器获取收藏商品详情
+    const fetchCollectionDetails = async () => {
+      loading.value = true
+      try {
+        // 获取用户收藏的商品ID列表
+        const favoriteIds = store.state.favorites
+        
+        // 模拟从API获取商品详情（实际应该批量请求）
+        // 这里使用模拟数据，实际项目中应该调用真实API
+        const mockDetails = [
+          {
+            id: 1,
+            name: '星空漫游 - 隐藏款',
+            series: '星空系列',
+            image: '/images/box1.jpg',
+            rarity: '隐藏',
+            acquiredDate: '2024-01-15',
+            description: '神秘的隐藏款式，带有星空特效'
+          },
+          {
+            id: 2,
+            name: '森林物语 - 普通款',
+            series: '森林物语系列',
+            image: '/images/box2.jpg',
+            rarity: '普通',
+            acquiredDate: '2024-01-10',
+            description: '经典的森林主题款式'
+          },
+          {
+            id: 3,
+            name: '海洋奇缘 - 稀有款',
+            series: '海洋奇缘系列',
+            image: '/images/box3.jpg',
+            rarity: '稀有',
+            acquiredDate: '2024-01-08',
+            description: '带有海洋波纹特效的稀有款式'
+          },
+          {
+            id: 4,
+            name: '城市探险 - 史诗款',
+            series: '城市探险系列',
+            image: '/images/box4.jpg',
+            rarity: '史诗',
+            acquiredDate: '2024-01-05',
+            description: '展现城市风貌的史诗级收藏品'
+          },
+          {
+            id: 5,
+            name: '夏日限定 - 传说款',
+            series: '夏日限定系列',
+            image: '/images/box1.jpg',
+            rarity: '传说',
+            acquiredDate: '2024-01-03',
+            description: '夏季限定的传说级收藏品'
+          },
+          {
+            id: 6,
+            name: '复古经典 - 普通款',
+            series: '复古经典系列',
+            image: '/images/box2.jpg',
+            rarity: '普通',
+            acquiredDate: '2024-01-01',
+            description: '怀旧风格的经典款式'
+          }
+        ]
+        
+        // 如果未登录或收藏列表为空，使用示例数据用于展示
+        if (!store.getters.isLoggedIn || favoriteIds.length === 0) {
+          // 使用部分模拟数据作为示例展示
+          collections.value = mockDetails.slice(0, 3)
+        } else {
+          // 只显示收藏中的商品
+          collections.value = mockDetails.filter(item => favoriteIds.includes(item.id))
+        }
+        
+      } catch (error) {
+        console.error('获取收藏详情失败:', error)
+        // 发生错误时使用默认的模拟数据
+        const mockDetails = [
+          {
+            id: 1,
+            name: '星空漫游 - 隐藏款',
+            series: '星空系列',
+            image: '/images/box1.jpg',
+            rarity: '隐藏',
+            acquiredDate: '2024-01-15',
+            description: '神秘的隐藏款式，带有星空特效'
+          },
+          {
+            id: 2,
+            name: '森林物语 - 普通款',
+            series: '森林物语系列',
+            image: '/images/box2.jpg',
+            rarity: '普通',
+            acquiredDate: '2024-01-10',
+            description: '经典的森林主题款式'
+          },
+          {
+            id: 3,
+            name: '海洋奇缘 - 稀有款',
+            series: '海洋奇缘系列',
+            image: '/images/box3.jpg',
+            rarity: '稀有',
+            acquiredDate: '2024-01-08',
+            description: '带有海洋波纹特效的稀有款式'
+          }
+        ]
+        collections.value = mockDetails
+      } finally {
+        loading.value = false
+      }
+    }
+    
+    // 同步收藏数据
+    const syncCollections = async () => {
+      try {
+        // 尝试从服务器同步数据，传递用户ID
+        // 这里不需要try-catch，因为store中已经处理了错误情况并返回false而不是抛出异常
+        const synced = await store.dispatch('syncFromServer')
+        console.log('收藏数据同步结果:', synced ? '成功' : '失败或跳过')
+        // 无论同步结果如何，都获取收藏详情（可能是本地数据）
+        fetchCollectionDetails()
+      } catch (error) {
+        console.error('同步收藏数据异常:', error.message || error)
+        // 发生异常时也尝试获取本地收藏数据，确保页面不空白
+        fetchCollectionDetails()
+      }
+    }
 
-      // 设置拖拽旋转
-      setupDragRotation()
+    onMounted(async () => {
+      try {
+        console.log('收藏馆页面开始初始化')
+        // 初始化3D展馆拖拽旋转
+        const dragCleanup = setupDragRotation()
+        
+        // 先设置默认数据，确保页面不会空白
+        const mockCollections = [
+          {
+            id: 1,
+            name: '星空漫游 - 隐藏款',
+            series: '星空系列',
+            image: '/images/box1.jpg',
+            rarity: '隐藏',
+            acquiredDate: '2024-01-15',
+            description: '神秘的隐藏款式，带有星空特效'
+          },
+          {
+            id: 2,
+            name: '森林物语 - 普通款',
+            series: '森林物语系列',
+            image: '/images/box2.jpg',
+            rarity: '普通',
+            acquiredDate: '2024-01-10',
+            description: '经典的森林主题款式'
+          },
+          {
+            id: 3,
+            name: '海洋奇缘 - 稀有款',
+            series: '海洋奇缘系列',
+            image: '/images/box3.jpg',
+            rarity: '稀有',
+            acquiredDate: '2024-01-08',
+            description: '带有海洋波纹特效的稀有款式'
+          }
+        ]
+        
+        if (collections.value.length === 0 && !store.state.favorites.length) {
+          console.log('使用默认模拟数据初始化页面')
+          collections.value = mockCollections
+        }
+        
+        // 然后尝试从服务器同步数据
+        await syncCollections()
+        
+        console.log('收藏馆页面初始化完成')
+      } catch (error) {
+        console.error('收藏馆页面初始化异常:', error.message || error)
+        // 即使初始化失败，也确保有默认数据显示
+        if (collections.value.length === 0) {
+          collections.value = [
+            {
+              id: 1,
+              name: '星空漫游 - 隐藏款',
+              series: '星空系列',
+              image: '/images/box1.jpg',
+              rarity: '隐藏',
+              acquiredDate: '2024-01-15',
+              description: '神秘的隐藏款式，带有星空特效'
+            },
+            {
+              id: 2,
+              name: '森林物语 - 普通款',
+              series: '森林物语系列',
+              image: '/images/box2.jpg',
+              rarity: '普通',
+              acquiredDate: '2024-01-10',
+              description: '经典的森林主题款式'
+            },
+            {
+              id: 3,
+              name: '海洋奇缘 - 稀有款',
+              series: '海洋奇缘系列',
+              image: '/images/box3.jpg',
+              rarity: '稀有',
+              acquiredDate: '2024-01-08',
+              description: '带有海洋波纹特效的稀有款式'
+            }
+          ]
+        }
+      }
     })
 
     return {
@@ -485,6 +654,7 @@ export default {
       autoRotate,
       selectedExhibit,
       galleryContainer,
+      loading,
       totalCollections,
       uniqueSeries,
       rareItems,
@@ -497,7 +667,9 @@ export default {
       rotateGallery,
       resetGallery,
       selectExhibit,
-      shareExhibit
+      shareExhibit,
+      syncCollections,
+      store
     }
   }
 }

@@ -87,7 +87,7 @@
           <div v-for="box in recommendedBoxes"
                :key="box.id"
                class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-            <div class="box-card">
+            <div class="box-card cursor-pointer" @click="navigateToDetail(box)">
               <div class="card h-100 position-relative">
                 <div class="card-img-container position-relative overflow-hidden">
                   <img
@@ -129,14 +129,14 @@
                   <div class="mt-auto">
                     <button
                         class="btn btn-primary w-100 mb-2"
-                        @click="handleBuy(box)"
+                        @click.stop="handleBuy(box)"
                         :disabled="box.stock === 0"
                     >
                       {{ box.stock === 0 ? '已售罄' : '立即购买' }}
                     </button>
                     <button
                         class="btn btn-outline-secondary w-100"
-                        @click="addToWishlist(box)"
+                        @click.stop="addToWishlist(box)"
                     >
                       加入心愿单
                     </button>
@@ -157,16 +157,17 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 
 // 导入本地盲盒图片
-import box1 from '@/assets/images/boxes/box1.jpg'
-import box2 from '@/assets/images/boxes/box2.jpg'
-import box3 from '@/assets/images/boxes/box3.jpg'
-import box4 from '@/assets/images/boxes/box4.jpg'
+// 使用public目录下的资源
+const box1 = '/images/box1.jpg'
+const box2 = '/images/box2.jpg'
+const box3 = '/images/box3.jpg'
+const box4 = '/images/box4.jpg'
 
-// 导入轮播图图片
-import banner1 from '@/assets/images/banners/banner1.jpg'
-import banner2 from '@/assets/images/banners/banner2.jpg'
-import banner3 from '@/assets/images/banners/banner3.jpg'
-import banner4 from '@/assets/images/banners/banner4.jpg'
+// 轮播图数据
+const banner1 = '/images/banners/banner1.jpg'
+const banner2 = '/images/banners/banner2.jpg'
+const banner3 = '/images/banners/banner3.jpg'
+const banner4 = '/images/banners/banner4.jpg'
 
 export default {
   name: 'HomePage',
@@ -290,12 +291,8 @@ export default {
     }
 
     const handleBuy = (boxData) => {
-      if (!store.getters.isLoggedIn) {
-        router.push('/login')
-        return
-      }
-      console.log('购买盲盒:', boxData)
-      // 处理购买逻辑
+      // 与navigateToDetail方法行为一致，点击跳转到商品详情页
+      router.push(`/product/${boxData.id}`)
     }
 
     const addToWishlist = (boxData) => {
@@ -303,8 +300,22 @@ export default {
         router.push('/login')
         return
       }
-      console.log('添加到心愿单:', boxData)
-      // 添加到心愿单逻辑
+      
+      // 添加到心愿单
+      if (!store.state.favorites.includes(boxData.id)) {
+        store.commit('ADD_FAVORITE', boxData.id)
+        console.log('已添加到心愿单:', boxData)
+        alert('已添加到心愿单')
+      } else {
+        console.log('商品已在心愿单中:', boxData)
+        alert('商品已在心愿单中')
+      }
+    }
+    
+    // 处理商品卡片点击事件，跳转到商品详情页
+    const navigateToDetail = (boxData) => {
+      // 与navigateToDetail方法行为一致，点击跳转到商品详情页
+      router.push(`/product/${boxData.id}`)
     }
 
     onMounted(() => {
@@ -328,7 +339,8 @@ export default {
       handleBannerError,
       handleBoxImageError,
       handleBuy,
-      addToWishlist
+      addToWishlist,
+      navigateToDetail
     }
   }
 }

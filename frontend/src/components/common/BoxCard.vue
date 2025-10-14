@@ -1,6 +1,6 @@
 <template>
-  <div class="box-card col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-    <div class="card h-100 position-relative">
+  <div class="box-card mb-4">
+    <div class="card h-100 position-relative" @click="navigateToDetail">
       <!-- 商品图片 -->
       <div class="card-img-container position-relative overflow-hidden">
         <img
@@ -20,7 +20,7 @@
         <!-- 收藏按钮 -->
         <button
             class="btn btn-like position-absolute top-0 end-0 m-2"
-            @click="toggleFavorite"
+            @click.stop="toggleFavorite"
         >
           <i :class="['bi', isFavorited ? 'bi-heart-fill text-danger' : 'bi-heart']"></i>
         </button>
@@ -51,14 +51,14 @@
         <div class="mt-auto">
           <button
               class="btn btn-primary w-100 mb-2"
-              @click="handleBuy"
+              @click.stop="handleBuy"
               :disabled="boxData.stock === 0"
           >
             {{ boxData.stock === 0 ? '已售罄' : '立即购买' }}
           </button>
           <button
               class="btn btn-outline-secondary w-100"
-              @click="addToWishlist"
+              @click.stop="addToWishlist"
           >
             加入心愿单
           </button>
@@ -71,6 +71,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'BoxCard',
@@ -83,14 +84,21 @@ export default {
   setup(props) {
     const imageLoaded = ref(false)
     const store = useStore()
+    const router = useRouter()
 
     const isFavorited = computed(() => {
       return store.state.favorites.includes(props.boxData.id)
     })
 
+    // 商品卡片点击跳转详情页
+    const navigateToDetail = () => {
+      router.push(`/product/${props.boxData.id}`)
+    }
+
     const toggleFavorite = () => {
       if (!store.getters.isLoggedIn) {
         // 跳转到登录页面
+        router.push('/login')
         return
       }
 
@@ -101,26 +109,54 @@ export default {
       }
     }
 
-    const handleBuy = () => {
+    const handleBuy = async () => {
       if (!store.getters.isLoggedIn) {
         // 跳转到登录页面
+        router.push('/login')
         return
       }
-      // 触发购买事件
-      console.log('购买盲盒:', props.boxData)
+      
+      try {
+        // 调用createOrder action创建订单
+        const result = await store.dispatch('createOrder', {
+          productId: props.boxData.id,
+          quantity: 1
+        })
+        
+        if (result.success) {
+          console.log('购买成功:', result.data)
+          // 可以添加购买成功后的提示和页面跳转
+          router.push('/orders')
+        } else {
+          console.error('购买失败:', result.message)
+          alert(`购买失败: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('购买过程中发生错误:', error)
+        alert('购买过程中发生错误，请重试')
+      }
     }
 
     const addToWishlist = () => {
       if (!store.getters.isLoggedIn) {
         // 跳转到登录页面
+        router.push('/login')
         return
       }
-      console.log('添加到心愿单:', props.boxData)
+      
+      // 添加到心愿单
+      if (!isFavorited.value) {
+        store.commit('ADD_FAVORITE', props.boxData.id)
+        console.log('已添加到心愿单:', props.boxData)
+      } else {
+        console.log('商品已在心愿单中:', props.boxData)
+      }
     }
 
     return {
       imageLoaded,
       isFavorited,
+      navigateToDetail,
       toggleFavorite,
       handleBuy,
       addToWishlist

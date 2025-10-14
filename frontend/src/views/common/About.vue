@@ -130,7 +130,8 @@
 import { ref, onMounted } from 'vue'
 
 // 导入Logo图片
-import logoImage from '@/assets/images/Logo.png'
+// 使用public目录下的Logo
+const logoImage = '/images/Logo.png'
 
 export default {
   name: 'AboutPage',
@@ -187,20 +188,32 @@ export default {
       { id: 4, number: '50+', label: '合作品牌' }
     ])
 
+    // 获取默认头像（与系统登录后的默认头像保持一致）
+    const getDefaultAvatar = () => {
+      return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiM2QjIxQTgiLz4KPHBhdGggZD0iTTE2IDE3QzE4LjIwOTEgMTcgMjAgMTUuMjA5MSAyMCAxM0MyMCAxMC43OTA5IDE4LjIwOTEgOSAxNiA5QzEzLjc5MDkgOSAxMiAxMC43OTA5IDEyIDEzQzEyIDE1LjIwOTEgMTMuNzkwOSAxNyAxNiAxN1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xNiAyMEMxMC40NzczIDIwIDYgMjQuNDc3MyA2IDI5SDI2QzI2IDI0LjQ3NzMgMjEuNTIzIDIwIDE2IDIwWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=='
+    }
+
     const teamMembers = ref([
       {
         id: 1,
         name: '张巡',
         role: '项目指导',
         description: '资深互联网产品专家',
-        avatar: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiM2QjIxQTgiLz4KPHBhdGggZD0iTTQwIDQzQzQzLjMxMzcgNDMgNDYgNDAuMzEzNyA0NiAzN0M0NiAzMy42ODYzIDQzLjMxMzcgMzEgNDAgMzFDMzYuNjg2MyAzMSAzNCAzMy42ODYzIDM0IDM3QzM0IDQwLjMxMzcgMzYuNjg2MyA0MyA0MCA0M1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik00MCA0NEMzMi4yNjgzIDQ0IDI2IDQ4LjY4NjMgMjYgNTRINTBDNTAgNDguNjg2MyA0Ny43MzE3IDQ0IDQwIDQ0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=='
+        avatar: getDefaultAvatar()
       },
       {
         id: 2,
         name: '蔡杰',
         role: '前端开发',
         description: 'Vue.js技术专家',
-        avatar: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiMxMEI5ODEiLz4KPHBhdGggZD0iTTQwIDQzQzQzLjMxMzcgNDMgNDYgNDAuMzEzNyA0NiAzN0M0NiAzMy42ODYzIDQzLjMxMzcgMzEgNDAgMzFDMzYuNjg2MyAzMSAzNCAzMy42ODYzIDM0IDM3QzM0IDQwLjMxMzcgMzYuNjg2MyA0MyA0MCA0M1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik00MCA0NEMzMi4yNjgzIDQ0IDI2IDQ4LjY4NjMgMjYgNTRINTBDNTAgNDguNjg2MyA0Ny43MzE3IDQ0IDQwIDQ0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=='
+        avatar: getDefaultAvatar()
+      },
+      {
+        id: 3,
+        name: '吴志豪',
+        role: 'UI设计',
+        description: '资深UI设计师，专注用户体验',
+        avatar: getDefaultAvatar()
       }
     ])
 
@@ -328,8 +341,12 @@ export default {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  background-color: white;
   border: 3px solid var(--primary-purple);
+  display: block;
+  margin: 0 auto;
 }
 
 .contact-info {
