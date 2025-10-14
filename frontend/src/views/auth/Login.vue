@@ -2,9 +2,10 @@
   <div class="auth-page">
     <!-- 视频背景 -->
     <video class="video-background" autoplay muted loop playsinline>
-      <source src="/frontend/src/assets/videos/auth-bg.mp4" type="video/mp4">
-      <!-- 备用图片 -->
-      <img src="../../assets/images/auth-bg-fallback.jpg" alt="背景图">
+      <!-- 修正视频路径：移除/frontend前缀，使用@别名指向src目录 -->
+      <source src="@/assets/videos/auth-bg.mp4" type="video/mp4">
+      <!-- 若视频加载失败，显示备用图片 -->
+      <img src="@/assets/images/auth-bg-fallback.jpg" alt="认证页面背景">
     </video>
 
     <div class="auth-container">
