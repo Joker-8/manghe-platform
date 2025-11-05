@@ -1,0 +1,746 @@
+{
+  "startTime": "2025-11-05T19:18:06.279Z",
+  "database": {
+    "tables": [
+      "users",
+      "verification_codes",
+      "user_collections",
+      "user_follows"
+    ],
+    "indexes": [
+      "sqlite_autoindex_users_1 (users)",
+      "sqlite_autoindex_users_2 (users)",
+      "sqlite_autoindex_users_3 (users)",
+      "idx_username (users)",
+      "idx_email (users)",
+      "idx_phone (users)",
+      "idx_verification_phone (verification_codes)",
+      "idx_verification_expires_at (verification_codes)",
+      "idx_verification_status (verification_codes)",
+      "idx_user_collections_user_id (user_collections)",
+      "idx_user_collections_item (user_collections)",
+      "sqlite_autoindex_user_follows_1 (user_follows)",
+      "idx_user_follows_follower (user_follows)",
+      "idx_user_follows_followed (user_follows)",
+      "idx_user_follows_both (user_follows)"
+    ],
+    "triggers": [
+      "clean_expired_verification_codes (verification_codes)"
+    ],
+    "tableStats": {
+      "users": 0,
+      "verification_codes": 0,
+      "user_collections": 0,
+      "user_follows": 0
+    },
+    "initializationStatus": "success",
+    "initializationError": null,
+    "structureValid": true,
+    "missingTables": [],
+    "checks": {
+      "total": 12,
+      "successful": 12,
+      "failed": 0
+    },
+    "lastSuccessfulCheck": "2025-11-05T19:23:36.371Z",
+    "lastFailedCheck": null,
+    "errors": [],
+    "connectionHistory": [
+      {
+        "time": "2025-11-05T19:18:06.302Z",
+        "status": "success",
+        "latency": 5
+      },
+      {
+        "time": "2025-11-05T19:18:36.313Z",
+        "status": "success",
+        "latency": 4
+      },
+      {
+        "time": "2025-11-05T19:19:06.319Z",
+        "status": "success",
+        "latency": 5
+      },
+      {
+        "time": "2025-11-05T19:19:36.334Z",
+        "status": "success",
+        "latency": 8
+      },
+      {
+        "time": "2025-11-05T19:20:06.334Z",
+        "status": "success",
+        "latency": 5
+      },
+      {
+        "time": "2025-11-05T19:20:36.345Z",
+        "status": "success",
+        "latency": 4
+      },
+      {
+        "time": "2025-11-05T19:21:06.348Z",
+        "status": "success",
+        "latency": 3
+      },
+      {
+        "time": "2025-11-05T19:21:36.350Z",
+        "status": "success",
+        "latency": 5
+      },
+      {
+        "time": "2025-11-05T19:22:06.353Z",
+        "status": "success",
+        "latency": 5
+      },
+      {
+        "time": "2025-11-05T19:22:36.354Z",
+        "status": "success",
+        "latency": 5
+      },
+      {
+        "time": "2025-11-05T19:23:06.370Z",
+        "status": "success",
+        "latency": 7
+      },
+      {
+        "time": "2025-11-05T19:23:36.371Z",
+        "status": "success",
+        "latency": 5
+      }
+    ]
+  },
+  "service": {
+    "checks": {
+      "total": 35,
+      "successful": 26,
+      "failed": 9
+    },
+    "lastSuccessfulCheck": "2025-11-05T19:23:46.537Z",
+    "lastFailedCheck": "2025-11-05T19:23:26.506Z",
+    "responseTimes": [
+      41,
+      7,
+      7,
+      7,
+      7,
+      11,
+      8,
+      8,
+      8,
+      9,
+      8,
+      10,
+      7,
+      8,
+      6,
+      7,
+      6,
+      8,
+      9,
+      5,
+      8,
+      6,
+      5,
+      9,
+      13,
+      7
+    ],
+    "errors": [
+      {
+        "time": "2025-11-05T19:22:06.454Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:22:16.461Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:22:26.471Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:22:36.473Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:22:46.474Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:22:56.476Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:23:06.489Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:23:16.493Z",
+        "message": ""
+      },
+      {
+        "time": "2025-11-05T19:23:26.506Z",
+        "message": ""
+      }
+    ],
+    "healthHistory": [
+      {
+        "time": "2025-11-05T19:18:06.350Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 41,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:18:16.322Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:18:26.326Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:18:36.325Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:18:46.335Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:18:56.340Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 11,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:19:06.340Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:19:16.342Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:19:26.342Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:19:36.345Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 9,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:19:46.343Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:19:56.354Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 10,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:20:06.352Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:20:16.359Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:20:26.374Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 6,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:20:36.378Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:20:46.391Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 6,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:20:56.395Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:21:06.395Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 9,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:21:16.403Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 5,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:21:26.419Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 8,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:21:36.427Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 6,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:21:46.440Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 5,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:21:56.446Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 9,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:22:06.455Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:22:16.462Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:22:26.473Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:22:36.474Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:22:46.475Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:22:56.477Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:23:06.490Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:23:16.494Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:23:26.508Z",
+        "status": "error",
+        "error": ""
+      },
+      {
+        "time": "2025-11-05T19:23:36.532Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 13,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      },
+      {
+        "time": "2025-11-05T19:23:46.539Z",
+        "status": "success",
+        "statusCode": 200,
+        "responseTime": 7,
+        "response": {
+          "status": "OK",
+          "message": "芒盒后端服务运行正常"
+        }
+      }
+    ],
+    "loadTests": {
+      "completed": 6,
+      "failed": 0,
+      "errors": []
+    }
+  },
+  "process": {
+    "memoryHistory": [
+      {
+        "time": "2025-11-05T19:18:06.357Z",
+        "heapUsed": 5.470588684082031,
+        "heapTotal": 6.87109375,
+        "rss": 41.28515625
+      },
+      {
+        "time": "2025-11-05T19:18:16.315Z",
+        "heapUsed": 4.5590972900390625,
+        "heapTotal": 5.87109375,
+        "rss": 39.1796875
+      },
+      {
+        "time": "2025-11-05T19:18:26.319Z",
+        "heapUsed": 4.629920959472656,
+        "heapTotal": 5.87109375,
+        "rss": 39.2734375
+      },
+      {
+        "time": "2025-11-05T19:18:36.319Z",
+        "heapUsed": 4.7042999267578125,
+        "heapTotal": 5.87109375,
+        "rss": 39.47265625
+      },
+      {
+        "time": "2025-11-05T19:18:46.328Z",
+        "heapUsed": 4.981590270996094,
+        "heapTotal": 6.12109375,
+        "rss": 39.51171875
+      },
+      {
+        "time": "2025-11-05T19:18:56.329Z",
+        "heapUsed": 5.031227111816406,
+        "heapTotal": 6.12109375,
+        "rss": 39.56640625
+      },
+      {
+        "time": "2025-11-05T19:19:06.331Z",
+        "heapUsed": 5.123603820800781,
+        "heapTotal": 6.12109375,
+        "rss": 39.72265625
+      },
+      {
+        "time": "2025-11-05T19:19:16.334Z",
+        "heapUsed": 5.17279052734375,
+        "heapTotal": 6.12109375,
+        "rss": 39.73046875
+      },
+      {
+        "time": "2025-11-05T19:19:26.334Z",
+        "heapUsed": 5.222251892089844,
+        "heapTotal": 6.12109375,
+        "rss": 39.80859375
+      },
+      {
+        "time": "2025-11-05T19:19:36.335Z",
+        "heapUsed": 5.274024963378906,
+        "heapTotal": 6.12109375,
+        "rss": 39.9375
+      },
+      {
+        "time": "2025-11-05T19:19:46.337Z",
+        "heapUsed": 5.342018127441406,
+        "heapTotal": 6.12109375,
+        "rss": 40.0390625
+      },
+      {
+        "time": "2025-11-05T19:19:56.344Z",
+        "heapUsed": 5.38800048828125,
+        "heapTotal": 6.12109375,
+        "rss": 40.10546875
+      },
+      {
+        "time": "2025-11-05T19:20:06.345Z",
+        "heapUsed": 5.4798126220703125,
+        "heapTotal": 6.12109375,
+        "rss": 40.23046875
+      },
+      {
+        "time": "2025-11-05T19:20:16.351Z",
+        "heapUsed": 5.52899169921875,
+        "heapTotal": 6.12109375,
+        "rss": 40.27734375
+      },
+      {
+        "time": "2025-11-05T19:20:26.367Z",
+        "heapUsed": 4.811500549316406,
+        "heapTotal": 7.12109375,
+        "rss": 40.4453125
+      },
+      {
+        "time": "2025-11-05T19:20:36.372Z",
+        "heapUsed": 4.87786865234375,
+        "heapTotal": 7.12109375,
+        "rss": 40.51171875
+      },
+      {
+        "time": "2025-11-05T19:20:46.384Z",
+        "heapUsed": 4.9276275634765625,
+        "heapTotal": 7.12109375,
+        "rss": 40.51171875
+      },
+      {
+        "time": "2025-11-05T19:20:56.386Z",
+        "heapUsed": 4.976409912109375,
+        "heapTotal": 7.12109375,
+        "rss": 40.58203125
+      },
+      {
+        "time": "2025-11-05T19:21:06.387Z",
+        "heapUsed": 5.064262390136719,
+        "heapTotal": 7.12109375,
+        "rss": 40.84765625
+      },
+      {
+        "time": "2025-11-05T19:21:16.398Z",
+        "heapUsed": 5.108192443847656,
+        "heapTotal": 7.12109375,
+        "rss": 40.84765625
+      },
+      {
+        "time": "2025-11-05T19:21:26.411Z",
+        "heapUsed": 5.1524505615234375,
+        "heapTotal": 7.12109375,
+        "rss": 40.91796875
+      },
+      {
+        "time": "2025-11-05T19:21:36.421Z",
+        "heapUsed": 5.212577819824219,
+        "heapTotal": 7.12109375,
+        "rss": 40.9921875
+      },
+      {
+        "time": "2025-11-05T19:21:46.434Z",
+        "heapUsed": 5.2566986083984375,
+        "heapTotal": 7.12109375,
+        "rss": 41.0078125
+      },
+      {
+        "time": "2025-11-05T19:21:56.437Z",
+        "heapUsed": 5.300224304199219,
+        "heapTotal": 7.12109375,
+        "rss": 41.109375
+      },
+      {
+        "time": "2025-11-05T19:22:06.452Z",
+        "heapUsed": 5.383491516113281,
+        "heapTotal": 7.12109375,
+        "rss": 41.1796875
+      },
+      {
+        "time": "2025-11-05T19:22:16.460Z",
+        "heapUsed": 5.443092346191406,
+        "heapTotal": 7.12109375,
+        "rss": 41.2421875
+      },
+      {
+        "time": "2025-11-05T19:22:26.470Z",
+        "heapUsed": 5.71148681640625,
+        "heapTotal": 7.37109375,
+        "rss": 41.26171875
+      },
+      {
+        "time": "2025-11-05T19:22:36.471Z",
+        "heapUsed": 5.763641357421875,
+        "heapTotal": 7.37109375,
+        "rss": 41.3125
+      },
+      {
+        "time": "2025-11-05T19:22:46.472Z",
+        "heapUsed": 5.79888916015625,
+        "heapTotal": 7.37109375,
+        "rss": 41.34375
+      },
+      {
+        "time": "2025-11-05T19:22:56.473Z",
+        "heapUsed": 5.109291076660156,
+        "heapTotal": 6.37109375,
+        "rss": 40.3359375
+      },
+      {
+        "time": "2025-11-05T19:23:06.487Z",
+        "heapUsed": 5.442619323730469,
+        "heapTotal": 6.37109375,
+        "rss": 40.640625
+      },
+      {
+        "time": "2025-11-05T19:23:16.491Z",
+        "heapUsed": 5.477531433105469,
+        "heapTotal": 6.37109375,
+        "rss": 40.640625
+      },
+      {
+        "time": "2025-11-05T19:23:26.505Z",
+        "heapUsed": 5.512428283691406,
+        "heapTotal": 6.37109375,
+        "rss": 40.640625
+      },
+      {
+        "time": "2025-11-05T19:23:36.519Z",
+        "heapUsed": 5.564216613769531,
+        "heapTotal": 6.37109375,
+        "rss": 40.65625
+      },
+      {
+        "time": "2025-11-05T19:23:46.531Z",
+        "heapUsed": 5.607933044433594,
+        "heapTotal": 6.37109375,
+        "rss": 40.65625
+      }
+    ],
+    "crashes": [],
+    "midReports": [
+      {
+        "timestamp": "2025-11-05T19:23:06.305Z",
+        "uptime": 300.026,
+        "database": {
+          "initializationStatus": "success",
+          "checks": {
+            "total": 10,
+            "successful": 10,
+            "failed": 0
+          },
+          "lastSuccessfulCheck": "2025-11-05T19:22:36.354Z"
+        },
+        "service": {
+          "checks": {
+            "total": 30,
+            "successful": 24,
+            "failed": 6
+          },
+          "avgResponseTime": 8.958333333333334
+        },
+        "process": {
+          "memoryUsage": {
+            "time": "2025-11-05T19:22:56.473Z",
+            "heapUsed": 5.109291076660156,
+            "heapTotal": 6.37109375,
+            "rss": 40.3359375
+          }
+        }
+      }
+    ]
+  },
+  "endTime": null,
+  "overallStatus": "running"
+}

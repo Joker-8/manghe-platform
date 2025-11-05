@@ -1,0 +1,164 @@
+{
+  "startTime": "2025-11-05T19:14:56.192Z",
+  "databaseInitialization": {
+    "status": "success",
+    "tables": [
+      "users",
+      "verification_codes",
+      "user_collections",
+      "user_follows"
+    ],
+    "indexes": [
+      {
+        "name": "sqlite_autoindex_users_1",
+        "tbl_name": "users"
+      },
+      {
+        "name": "sqlite_autoindex_users_2",
+        "tbl_name": "users"
+      },
+      {
+        "name": "sqlite_autoindex_users_3",
+        "tbl_name": "users"
+      },
+      {
+        "name": "idx_username",
+        "tbl_name": "users"
+      },
+      {
+        "name": "idx_email",
+        "tbl_name": "users"
+      },
+      {
+        "name": "idx_phone",
+        "tbl_name": "users"
+      },
+      {
+        "name": "idx_verification_phone",
+        "tbl_name": "verification_codes"
+      },
+      {
+        "name": "idx_verification_expires_at",
+        "tbl_name": "verification_codes"
+      },
+      {
+        "name": "idx_verification_status",
+        "tbl_name": "verification_codes"
+      },
+      {
+        "name": "idx_user_collections_user_id",
+        "tbl_name": "user_collections"
+      },
+      {
+        "name": "idx_user_collections_item",
+        "tbl_name": "user_collections"
+      },
+      {
+        "name": "sqlite_autoindex_user_follows_1",
+        "tbl_name": "user_follows"
+      },
+      {
+        "name": "idx_user_follows_follower",
+        "tbl_name": "user_follows"
+      },
+      {
+        "name": "idx_user_follows_followed",
+        "tbl_name": "user_follows"
+      },
+      {
+        "name": "idx_user_follows_both",
+        "tbl_name": "user_follows"
+      }
+    ],
+    "constraints": [],
+    "initialData": {
+      "users": 0,
+      "verification_codes": 0,
+      "user_collections": 0,
+      "user_follows": 0
+    },
+    "error": null
+  },
+  "connectionStability": {
+    "totalChecks": 7,
+    "successfulChecks": 7,
+    "failedChecks": 0,
+    "failureTimes": [],
+    "connectionPoolStats": [],
+    "errors": []
+  },
+  "processStability": {
+    "running": true,
+    "memoryUsage": [
+      {
+        "timestamp": "2025-11-05T19:14:56.223Z",
+        "heapUsed": 4998488,
+        "heapTotal": 6787072
+      },
+      {
+        "timestamp": "2025-11-05T19:15:26.238Z",
+        "heapUsed": 4737392,
+        "heapTotal": 5894144
+      },
+      {
+        "timestamp": "2025-11-05T19:15:56.245Z",
+        "heapUsed": 5289880,
+        "heapTotal": 6156288
+      },
+      {
+        "timestamp": "2025-11-05T19:16:26.246Z",
+        "heapUsed": 5464920,
+        "heapTotal": 6156288
+      },
+      {
+        "timestamp": "2025-11-05T19:16:56.258Z",
+        "heapUsed": 5613808,
+        "heapTotal": 6156288
+      },
+      {
+        "timestamp": "2025-11-05T19:17:26.264Z",
+        "heapUsed": 5741832,
+        "heapTotal": 6156288
+      },
+      {
+        "timestamp": "2025-11-05T19:17:56.267Z",
+        "heapUsed": 5103728,
+        "heapTotal": 7204864
+      }
+    ],
+    "cpuUsage": [],
+    "crashes": [],
+    "restarts": [],
+    "uptime": null
+  },
+  "serviceHealth": {
+    "totalChecks": 19,
+    "successfulChecks": 9,
+    "failedChecks": 10,
+    "responseTimes": [
+      41,
+      9,
+      8,
+      7,
+      7,
+      7,
+      8,
+      8,
+      23
+    ],
+    "errors": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "endTime": "2025-11-05T19:18:05.857Z",
+  "overallStatus": "degraded"
+}

@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-11-05T14:13:07.660Z",
+  "environment": {
+    "nodeVersion": "v20.19.0",
+    "cwd": "E:\\qdxm\\WebStorm\\manghe-platform\\backend"
+  },
+  "testResults": {
+    "connection": "success",
+    "queryResult": 2,
+    "tablesFound": 8
+  }
+}

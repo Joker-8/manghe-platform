@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-11-05T14:06:56.328Z",
+  "success": true,
+  "connectionTime": 1,
+  "queryTime": 1,
+  "tablesFound": [
+    "users",
+    "products",
+    "orders",
+    "collections",
+    "posts",
+    "verification_codes",
+    "user_collections",
+    "user_follows"
+  ],
+  "concurrentTestResult": {
+    "total": 5,
+    "successful": 5,
+    "failure": 0
+  }
+}

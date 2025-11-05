@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-11-05T13:59:10.136Z",
+  "dbPath": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\data\\manghe.db",
+  "tests": [
+    {
+      "testName": "数据库连接测试",
+      "passed": true,
+      "timestamp": "2025-11-05T13:59:10.161Z",
+      "details": {
+        "result": 2
+      }
+    },
+    {
+      "testName": "数据库表结构验证",
+      "passed": true,
+      "timestamp": "2025-11-05T13:59:10.163Z",
+      "details": {
+        "foundTables": [
+          "users",
+          "products",
+          "orders",
+          "collections",
+          "posts",
+          "verification_codes",
+          "user_collections",
+          "user_follows"
+        ],
+        "expectedTables": [
+          "users",
+          "verification_codes",
+          "user_collections",
+          "user_follows"
+        ],
+        "tableCount": 8
+      }
+    },
+    {
+      "testName": "基本数据操作测试",
+      "passed": true,
+      "timestamp": "2025-11-05T13:59:10.164Z",
+      "details": {
+        "userCount": 3,
+        "hasAdminUser": false
+      }
+    },
+    {
+      "testName": "数据库索引验证",
+      "passed": true,
+      "timestamp": "2025-11-05T13:59:10.165Z",
+      "details": {
+        "indexCount": 13,
+        "indexes": [
+          "idx_username (users)",
+          "idx_email (users)",
+          "idx_phone (verification_codes)",
+          "idx_expires_at (verification_codes)",
+          "idx_status (verification_codes)",
+          "idx_user_collections_user_id (user_collections)",
+          "idx_user_collections_item (user_collections)",
+          "idx_user_follows_follower (user_follows)",
+          "idx_user_follows_followed (user_follows)",
+          "idx_user_follows_both (user_follows)",
+          "idx_verification_phone (verification_codes)",
+          "idx_verification_expires_at (verification_codes)",
+          "idx_verification_status (verification_codes)"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4
+  }
+}

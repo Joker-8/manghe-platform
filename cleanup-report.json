@@ -1,0 +1,537 @@
+{
+  "scanDate": "2025-11-05T19:36:15.703Z",
+  "projectRoot": "e:\\qdxm\\WebStorm\\manghe-platform",
+  "summary": {
+    "totalFilesScanned": 153088359,
+    "redundancyFound": 63,
+    "redundancySize": 151549441,
+    "redundancyPercentage": "98.99%"
+  },
+  "details": {
+    "byType": [
+      {
+        "type": "other",
+        "count": 48,
+        "size": 24892515,
+        "sizeFormatted": "23.74 MB"
+      },
+      {
+        "type": "backup",
+        "count": 1,
+        "size": 29793,
+        "sizeFormatted": "29.09 KB"
+      },
+      {
+        "type": "log",
+        "count": 14,
+        "size": 126627133,
+        "sizeFormatted": "120.76 MB"
+      }
+    ],
+    "byDirectory": [
+      {
+        "directory": "manghe-platform",
+        "count": 6,
+        "size": 63565,
+        "sizeFormatted": "62.08 KB"
+      },
+      {
+        "directory": "backend",
+        "count": 10,
+        "size": 101340,
+        "sizeFormatted": "98.96 KB"
+      },
+      {
+        "directory": "logs",
+        "count": 12,
+        "size": 126580237,
+        "sizeFormatted": "120.72 MB"
+      },
+      {
+        "directory": "boxes",
+        "count": 5,
+        "size": 1936434,
+        "sizeFormatted": "1.85 MB"
+      },
+      {
+        "directory": "images",
+        "count": 11,
+        "size": 6839478,
+        "sizeFormatted": "6.52 MB"
+      },
+      {
+        "directory": "utils",
+        "count": 1,
+        "size": 13102,
+        "sizeFormatted": "12.79 KB"
+      },
+      {
+        "directory": "frontend",
+        "count": 3,
+        "size": 261,
+        "sizeFormatted": "261 B"
+      },
+      {
+        "directory": "banners",
+        "count": 4,
+        "size": 1538452,
+        "sizeFormatted": "1.47 MB"
+      },
+      {
+        "directory": "tab-icons",
+        "count": 10,
+        "size": 7932130,
+        "sizeFormatted": "7.56 MB"
+      },
+      {
+        "directory": "videos",
+        "count": 1,
+        "size": 6544442,
+        "sizeFormatted": "6.24 MB"
+      }
+    ],
+    "filesToDelete": [
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\23级计算机应用技术专业毕业设计开题报告.docx",
+        "type": "other",
+        "size": 24647,
+        "sizeFormatted": "24.07 KB",
+        "modifiedTime": "2025-10-14T06:24:16.753Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\.env",
+        "type": "other",
+        "size": 180,
+        "sizeFormatted": "180 B",
+        "modifiedTime": "2025-11-05T13:55:31.503Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\app.js.backup",
+        "type": "backup",
+        "size": 29793,
+        "sizeFormatted": "29.09 KB",
+        "modifiedTime": "2025-11-05T18:37:00.661Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\daemon.log",
+        "type": "log",
+        "size": 46896,
+        "sizeFormatted": "45.8 KB",
+        "modifiedTime": "2025-11-05T11:01:13.655Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\app-2025-10-30.log",
+        "type": "log",
+        "size": 44842,
+        "sizeFormatted": "43.79 KB",
+        "modifiedTime": "2025-10-30T08:56:45.396Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\app-2025-11-02.log",
+        "type": "log",
+        "size": 7212,
+        "sizeFormatted": "7.04 KB",
+        "modifiedTime": "2025-11-02T12:19:42.867Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\app-2025-11-03.log",
+        "type": "log",
+        "size": 119646,
+        "sizeFormatted": "116.84 KB",
+        "modifiedTime": "2025-11-03T16:00:50.472Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\app-2025-11-04.log",
+        "type": "log",
+        "size": 61854,
+        "sizeFormatted": "60.4 KB",
+        "modifiedTime": "2025-11-04T17:32:40.534Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\app-2025-11-05.log",
+        "type": "log",
+        "size": 122292629,
+        "sizeFormatted": "116.63 MB",
+        "modifiedTime": "2025-11-05T19:35:58.736Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\db-health-checks.log",
+        "type": "log",
+        "size": 96027,
+        "sizeFormatted": "93.78 KB",
+        "modifiedTime": "2025-11-05T12:33:59.137Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\error-2025-11-03.log",
+        "type": "log",
+        "size": 9220,
+        "sizeFormatted": "9 KB",
+        "modifiedTime": "2025-11-03T14:20:12.772Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\error-2025-11-04.log",
+        "type": "log",
+        "size": 242,
+        "sizeFormatted": "242 B",
+        "modifiedTime": "2025-11-04T13:55:10.132Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\error-2025-11-05.log",
+        "type": "log",
+        "size": 3945422,
+        "sizeFormatted": "3.76 MB",
+        "modifiedTime": "2025-11-05T19:01:14.240Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\slow-queries.log",
+        "type": "log",
+        "size": 228,
+        "sizeFormatted": "228 B",
+        "modifiedTime": "2025-10-30T03:39:01.787Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\sms-2025-11-03.log",
+        "type": "log",
+        "size": 964,
+        "sizeFormatted": "964 B",
+        "modifiedTime": "2025-11-03T12:47:03.251Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\logs\\verification-2025-11-03.log",
+        "type": "log",
+        "size": 1951,
+        "sizeFormatted": "1.91 KB",
+        "modifiedTime": "2025-11-03T12:47:03.251Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\monitor-logs.txt",
+        "type": "other",
+        "size": 7540,
+        "sizeFormatted": "7.36 KB",
+        "modifiedTime": "2025-11-05T18:53:31.110Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\persistent-monitor-logs.txt",
+        "type": "other",
+        "size": 10763,
+        "sizeFormatted": "10.51 KB",
+        "modifiedTime": "2025-11-05T18:53:34.632Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\public\\images\\boxes\\box1.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.314Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\public\\images\\boxes\\box2.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.319Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\public\\images\\boxes\\box3.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.323Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\public\\images\\boxes\\box4.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.328Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\public\\images\\Logo.png",
+        "type": "other",
+        "size": 1652015,
+        "sizeFormatted": "1.58 MB",
+        "modifiedTime": "2025-10-14T06:24:21.278Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\run-stability-test.bat",
+        "type": "other",
+        "size": 1215,
+        "sizeFormatted": "1.19 KB",
+        "modifiedTime": "2025-11-05T19:22:51.106Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\server.log",
+        "type": "log",
+        "size": 0,
+        "sizeFormatted": "0 B",
+        "modifiedTime": "2025-11-05T19:23:05.113Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\simple-monitor-logs.txt",
+        "type": "other",
+        "size": 4366,
+        "sizeFormatted": "4.26 KB",
+        "modifiedTime": "2025-11-05T18:58:12.501Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\start-monitor.bat",
+        "type": "other",
+        "size": 157,
+        "sizeFormatted": "157 B",
+        "modifiedTime": "2025-11-05T18:54:48.337Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\start-monitor.ps1",
+        "type": "other",
+        "size": 430,
+        "sizeFormatted": "430 B",
+        "modifiedTime": "2025-11-05T18:55:39.358Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\backend\\utils\\final-db-connection-test.mjs",
+        "type": "other",
+        "size": 13102,
+        "sizeFormatted": "12.79 KB",
+        "modifiedTime": "2025-11-05T14:17:32.626Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\.env",
+        "type": "other",
+        "size": 114,
+        "sizeFormatted": "114 B",
+        "modifiedTime": "2025-11-04T01:24:45.393Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\.env.development",
+        "type": "other",
+        "size": 80,
+        "sizeFormatted": "80 B",
+        "modifiedTime": "2025-11-05T17:24:11.142Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\.env.production",
+        "type": "other",
+        "size": 67,
+        "sizeFormatted": "67 B",
+        "modifiedTime": "2025-11-05T16:49:49.984Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\auth-bg-fallback.jpg",
+        "type": "other",
+        "size": 829524,
+        "sizeFormatted": "810.08 KB",
+        "modifiedTime": "2025-10-14T06:24:21.289Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\banners\\banner1.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.295Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\banners\\banner2.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.299Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\banners\\banner3.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.304Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\banners\\banner4.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.308Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box1.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.314Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box2.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.319Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box3.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.323Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box4.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.328Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box5.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.314Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box6.jpg",
+        "type": "other",
+        "size": 371244,
+        "sizeFormatted": "362.54 KB",
+        "modifiedTime": "2025-10-14T06:24:21.319Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\box7.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.323Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\boxes\\box1.jpg",
+        "type": "other",
+        "size": 397982,
+        "sizeFormatted": "388.65 KB",
+        "modifiedTime": "2025-10-14T06:24:21.314Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\default-product.jpg",
+        "type": "other",
+        "size": 264,
+        "sizeFormatted": "264 B",
+        "modifiedTime": "2025-11-05T06:22:00.073Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\Logo.png",
+        "type": "other",
+        "size": 1652015,
+        "sizeFormatted": "1.58 MB",
+        "modifiedTime": "2025-10-14T06:24:21.278Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\community-active.png",
+        "type": "other",
+        "size": 754373,
+        "sizeFormatted": "736.69 KB",
+        "modifiedTime": "2025-10-14T06:24:21.336Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\community.png",
+        "type": "other",
+        "size": 832053,
+        "sizeFormatted": "812.55 KB",
+        "modifiedTime": "2025-10-14T06:24:21.344Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\home-active.png",
+        "type": "other",
+        "size": 754373,
+        "sizeFormatted": "736.69 KB",
+        "modifiedTime": "2025-10-14T06:24:21.350Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\home.png",
+        "type": "other",
+        "size": 832053,
+        "sizeFormatted": "812.55 KB",
+        "modifiedTime": "2025-10-14T06:24:21.356Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\open-active.png",
+        "type": "other",
+        "size": 754373,
+        "sizeFormatted": "736.69 KB",
+        "modifiedTime": "2025-10-14T06:24:21.363Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\open.png",
+        "type": "other",
+        "size": 832053,
+        "sizeFormatted": "812.55 KB",
+        "modifiedTime": "2025-10-14T06:24:21.368Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\profile-active.png",
+        "type": "other",
+        "size": 754373,
+        "sizeFormatted": "736.69 KB",
+        "modifiedTime": "2025-10-14T06:24:21.376Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\profile.png",
+        "type": "other",
+        "size": 832053,
+        "sizeFormatted": "812.55 KB",
+        "modifiedTime": "2025-10-14T06:24:21.384Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\shop-active.png",
+        "type": "other",
+        "size": 754373,
+        "sizeFormatted": "736.69 KB",
+        "modifiedTime": "2025-10-14T06:24:21.389Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\images\\tab-icons\\shop.png",
+        "type": "other",
+        "size": 832053,
+        "sizeFormatted": "812.55 KB",
+        "modifiedTime": "2025-10-14T06:24:21.396Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\frontend\\public\\videos\\auth-bg.mp4",
+        "type": "other",
+        "size": 6544442,
+        "sizeFormatted": "6.24 MB",
+        "modifiedTime": "2025-10-14T06:24:21.448Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\LICENSE",
+        "type": "other",
+        "size": 1084,
+        "sizeFormatted": "1.06 KB",
+        "modifiedTime": "2025-10-14T06:24:16.641Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\page-content.txt",
+        "type": "other",
+        "size": 0,
+        "sizeFormatted": "0 B",
+        "modifiedTime": "2025-10-30T08:25:42.071Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\scan-cleanup.ps1",
+        "type": "other",
+        "size": 2415,
+        "sizeFormatted": "2.36 KB",
+        "modifiedTime": "2025-11-02T13:18:03.300Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\《计算机应用技术毕业设计》任务书.docx",
+        "type": "other",
+        "size": 21138,
+        "sizeFormatted": "20.64 KB",
+        "modifiedTime": "2025-10-14T06:24:21.529Z"
+      },
+      {
+        "path": "e:\\qdxm\\WebStorm\\manghe-platform\\项目结构.txt",
+        "type": "other",
+        "size": 14281,
+        "sizeFormatted": "13.95 KB",
+        "modifiedTime": "2025-11-05T13:57:08.468Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "summary": {
+    "startTime": "2025-11-05T14:17:44.872Z",
+    "endTime": "2025-11-05T14:17:44.964Z",
+    "totalDuration": 92,
+    "totalTests": 5,
+    "passedTests": 5,
+    "failedTests": 0,
+    "successRate": "100.00",
+    "databaseInfo": {
+      "path": "E:\\qdxm\\WebStorm\\manghe-platform\\backend\\data\\manghe.db",
+      "fileSize": 118784,
+      "tables": [
+        "users",
+        "products",
+        "orders",
+        "collections",
+        "posts",
+        "verification_codes",
+        "user_collections",
+        "user_follows"
+      ]
+    }
+  },
+  "tests": [
+    {
+      "name": "基础连接验证",
+      "passed": true,
+      "timestamp": "2025-11-05T14:17:44.888Z",
+      "duration": 11,
+      "details": {
+        "success": true,
+        "duration": 11,
+        "details": {
+          "tablesFound": 8,
+          "databaseSize": "116.00 KB"
+        }
+      }
+    },
+    {
+      "name": "异常情况处理",
+      "passed": true,
+      "timestamp": "2025-11-05T14:17:44.892Z",
+      "duration": 4,
+      "details": {
+        "success": true,
+        "duration": 4,
+        "details": {
+          "exceptionResults": [
+            {
+              "name": "无效SQL语法",
+              "handled": true,
+              "error": "SQLITE_ERROR: near \"INVALID\": syntax error"
+            },
+            {
+              "name": "不存在的表",
+              "handled": true,
+              "error": "SQLITE_ERROR: no such table: non_existent_table"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "并发连接测试",
+      "passed": true,
+      "timestamp": "2025-11-05T14:17:44.910Z",
+      "duration": 18,
+      "details": {
+        "success": true,
+        "duration": 18,
+        "details": {
+          "total": 20,
+          "successful": 20,
+          "failed": 0,
+          "successRate": 1
+        }
+      }
+    },
+    {
+      "name": "连接池性能测试",
+      "passed": true,
+      "timestamp": "2025-11-05T14:17:44.957Z",
+      "duration": 46,
+      "details": {
+        "success": true,
+        "duration": 46,
+        "details": {
+          "totalQueries": 50,
+          "successfulQueries": 50,
+          "averageQueryTime": 0.86,
+          "queriesPerSecond": 1162.7906976744187
+        }
+      }
+    },
+    {
+      "name": "文件锁定测试",
+      "passed": true,
+      "timestamp": "2025-11-05T14:17:44.964Z",
+      "duration": 7,
+      "details": {
+        "success": true,
+        "duration": 7,
+        "details": {
+          "multiReadSuccess": true
+        }
+      }
+    }
+  ]
+}
