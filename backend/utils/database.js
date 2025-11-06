@@ -366,6 +366,101 @@ async function createTablesManually(db) {
       console.warn(`初始化管理员用户失败: ${err.message}`);
     }
     
+    // 创建商品表
+    try {
+      await db.run(`
+        CREATE TABLE IF NOT EXISTS products (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          description TEXT DEFAULT '',
+          price REAL NOT NULL DEFAULT 0,
+          original_price REAL DEFAULT 0,
+          category TEXT DEFAULT '',
+          series TEXT DEFAULT '',
+          brand TEXT DEFAULT '',
+          stock INTEGER DEFAULT 0,
+          sales INTEGER DEFAULT 0,
+          rating REAL DEFAULT 0,
+          review_count INTEGER DEFAULT 0,
+          images TEXT DEFAULT '[]',
+          is_hot INTEGER DEFAULT 0,
+          is_new INTEGER DEFAULT 0,
+          is_limited INTEGER DEFAULT 0,
+          probability TEXT DEFAULT '{}',
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      
+      // 添加索引
+      await db.run('CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_products_series ON products(series);');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_products_is_hot ON products(is_hot);');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_products_is_new ON products(is_new);');
+      
+      console.log('商品表初始化成功');
+      
+      // 插入测试商品数据
+      await db.run(
+        'INSERT OR IGNORE INTO products (name, description, price, stock, category, series) VALUES (?, ?, ?, ?, ?, ?)',
+        ['星空幻想系列', '限量版星空主题盲盒', 89, 100, '主题盲盒', '星空系列']
+      );
+      await db.run(
+        'INSERT OR IGNORE INTO products (name, description, price, stock, category, series) VALUES (?, ?, ?, ?, ?, ?)',
+        ['森林物语系列', '季节限定森林主题', 79, 50, '主题盲盒', '森林系列']
+      );
+      await db.run(
+        'INSERT OR IGNORE INTO products (name, description, price, stock, category, series) VALUES (?, ?, ?, ?, ?, ?)',
+        ['海洋奇缘系列', '特别版海洋主题', 99, 30, '主题盲盒', '海洋系列']
+      );
+    } catch (productError) {
+      console.warn(`初始化商品表失败: ${productError.message}`);
+    }
+    
+    // 创建订单表
+    try {
+      await db.run(`
+        CREATE TABLE IF NOT EXISTS orders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          items TEXT NOT NULL,
+          total_amount REAL NOT NULL,
+          status TEXT DEFAULT 'pending',
+          payment_method TEXT DEFAULT '',
+          payment_id TEXT DEFAULT '',
+          shipping_address TEXT DEFAULT '{}',
+          tracking_number TEXT DEFAULT '',
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          paid_at TEXT,
+          shipped_at TEXT,
+          delivered_at TEXT,
+          cancelled_at TEXT,
+          cancellation_reason TEXT DEFAULT '',
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+      `);
+      
+      // 添加索引
+      await db.run('CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);');
+      
+      console.log('订单表初始化成功');
+      
+      // 插入测试订单数据
+      await db.run(
+        'INSERT OR IGNORE INTO orders (user_id, items, total_amount, status) VALUES (?, ?, ?, ?)',
+        [1, '{"items": [{"id": 1, "name": "星空幻想系列", "quantity": 1, "price": 89}]}', 89, 'pending']
+      );
+      await db.run(
+        'INSERT OR IGNORE INTO orders (user_id, items, total_amount, status) VALUES (?, ?, ?, ?)',
+        [1, '{"items": [{"id": 2, "name": "森林物语系列", "quantity": 2, "price": 158}]}', 158, 'paid']
+      );
+    } catch (orderError) {
+      console.warn(`初始化订单表失败: ${orderError.message}`);
+    }
+    
   } catch (error) {
     console.error(`手动创建表失败: ${error.message}`);
     throw error;

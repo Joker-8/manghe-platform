@@ -38,10 +38,10 @@
         <div class="col-lg-3 col-md-6 mb-4">
           <h6 class="footer-title">客户服务</h6>
           <ul class="footer-links">
-            <li><a href="#" class="footer-link">帮助中心</a></li>
-            <li><a href="#" class="footer-link">联系客服</a></li>
-            <li><a href="#" class="footer-link">退换货政策</a></li>
-            <li><a href="#" class="footer-link">配送信息</a></li>
+            <li><router-link to="/customer-service/help" class="footer-link">帮助中心</router-link></li>
+            <li><router-link to="/customer-service/contact" class="footer-link">联系客服</router-link></li>
+            <li><router-link to="/customer-service/return-policy" class="footer-link">退换货政策</router-link></li>
+            <li><router-link to="/customer-service/shipping-info" class="footer-link">配送信息</router-link></li>
           </ul>
         </div>
 
@@ -88,9 +88,9 @@
           </div>
           <div class="col-md-6">
             <div class="footer-legal-links">
-              <a href="#" class="legal-link">隐私政策</a>
-              <a href="#" class="legal-link">服务条款</a>
-              <a href="#" class="legal-link">法律声明</a>
+              <router-link to="/privacy-policy" class="legal-link">隐私政策</router-link>
+              <router-link to="/terms-of-service" class="legal-link">服务条款</router-link>
+              <router-link to="/legal-notice" class="legal-link">法律声明</router-link>
             </div>
           </div>
         </div>

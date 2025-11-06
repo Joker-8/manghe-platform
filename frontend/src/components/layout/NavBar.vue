@@ -11,13 +11,33 @@
         >
       </router-link>
 
-      <!-- 高级搜索框 -->
+      <!-- 搜索框 -->
       <div class="search-container mx-3 flex-grow-1" v-if="!isMobile">
-        <AdvancedSearch 
-          placeholder="搜索盲盒名称或系列..."
-          :items="searchItems"
-          @search="handleSearch"
-        />
+        <div class="input-group">
+          <input
+              type="text"
+              class="form-control"
+              placeholder="搜索盲盒系列..."
+              v-model="searchKeyword"
+              @keyup.enter="handleSearch"
+              @focus="showSearchSuggestions = true"
+              @blur="handleSearchBlur"
+          >
+          <button class="btn btn-light" type="button" @click="handleSearch">
+            <i class="bi bi-search"></i>
+          </button>
+          <!-- 搜索建议 -->
+          <div v-if="showSearchSuggestions && searchKeyword && searchSuggestions.length > 0" class="search-suggestions">
+            <div 
+                v-for="suggestion in searchSuggestions" 
+                :key="suggestion"
+                class="suggestion-item"
+                @mousedown="selectSuggestion(suggestion)"
+            >
+              {{ suggestion }}
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 导航链接 -->
@@ -27,16 +47,19 @@
         <router-link class="nav-link" to="/community">社区</router-link>
 
         <!-- 用户相关 -->
-        <div class="nav-item dropdown" v-if="isLoggedIn">
-          <a class="nav-link d-flex align-items-center position-relative" href="#" role="button">
-            <img :src="avatar" class="user-avatar rounded-circle" alt="头像" @error="handleAvatarError">
-          </a>
-          <ul class="dropdown-menu">
-            <li class="dropdown-item disabled">{{ nickname }}</li>
-            <li><router-link class="dropdown-item" to="/profile">个人中心</router-link></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" @click="handleLogout">退出登录</a></li>
-          </ul>
+        <div class="nav-item position-relative" v-if="isLoggedIn">
+          <div class="user-dropdown position-relative">
+            <a class="nav-link d-flex align-items-center" href="#" role="button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+              <img :src="avatar" class="user-avatar rounded-circle" alt="头像" @error="handleAvatarError">
+            </a>
+            <ul class="dropdown-menu" v-show="showDropdown" @mouseenter="handleMenuMouseEnter" @mouseleave="handleMenuMouseLeave">
+              <li class="dropdown-header">{{ userNickname }}</li>
+              <li><router-link class="dropdown-item" to="/profile">个人中心</router-link></li>
+              <li><router-link class="dropdown-item" to="/edit-profile">编辑资料</router-link></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" @click="handleLogout">退出登录</a></li>
+            </ul>
+          </div>
         </div>
 
         <div v-else>
@@ -49,69 +72,35 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
-import AdvancedSearch from '@/components/common/AdvancedSearch.vue'
 
 // 直接导入图片
 // 使用public目录下的Logo
 const logoImage = '/images/Logo.png'
 
-// 模拟商品数据，用于搜索建议
-const mockBoxes = [
-  {
-    id: 1,
-    name: '星空幻想盲盒',
-    series: '星空幻想系列'
-  },
-  {
-    id: 2,
-    name: '森林精灵盲盒',
-    series: '森林物语系列'
-  },
-  {
-    id: 3,
-    name: '海洋探险盲盒',
-    series: '海洋探险系列'
-  },
-  {
-    id: 4,
-    name: '城市霓虹盲盒',
-    series: '城市霓虹系列'
-  },
-  {
-    id: 5,
-    name: '童话梦境盲盒',
-    series: '童话梦境系列'
-  },
-  {
-    id: 6,
-    name: '复古经典盲盒',
-    series: '复古经典系列'
-  },
-  {
-    id: 7,
-    name: '夏日限定盲盒',
-    series: '夏日限定系列'
-  }
-]
-
 export default {
   name: 'NavBar',
-  components: {
-    AdvancedSearch
-  },
   setup() {
-    const searchItems = ref([])
+    const searchKeyword = ref('')
+    const showSearchSuggestions = ref(false)
+    const searchSuggestions = ref([])
+    const showDropdown = ref(false)
     const store = useStore()
     const router = useRouter()
     const route = useRoute()
+    
+    // 模拟搜索建议数据
+    const mockSuggestions = [
+      '星空幻想盲盒', '城市探险', '海洋奇缘', '童话世界', '未来科技',
+      '复古经典', '夏日限定', '限量款式', '新品上市', '热销商品'
+    ]
 
     const isMobile = computed(() => window.innerWidth <= 768)
     const isLoggedIn = computed(() => store.getters.isLoggedIn)
     const username = computed(() => store.getters.username || '用户')
-    const nickname = computed(() => store.getters.nickname)
+    const userNickname = computed(() => store.getters.nickname || username.value || '用户')
     const avatar = computed(() => store.getters.avatar || getDefaultAvatar())
 
     // 检查是否需要隐藏导航栏
@@ -136,41 +125,114 @@ export default {
       return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiM2QjIxQTgiLz4KPHBhdGggZD0iTTE2IDE3QzE4LjIwOTEgMTcgMjAgMTUuMjA5MSAyMCAxM0MyMCAxMC43OTA5IDE4LjIwOTEgOSAxNiA5QzEzLjc5MDkgOSAxMiAxMC43OTA5IDEyIDEzQzEyIDE1LjIwOTEgMTMuNzkwOSAxNyAxNiAxN1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xNiAxOEMxMS41ODIyIDE4IDggMjAuNjg2MyA4IDI0SDE2SDI0QzI0IDIwLjY4NjMgMjAuNDE3OCAxOCAxNiAxOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo='
     }
 
-    const handleLogout = () => {
-      store.dispatch('logout')
-      router.push('/')
+    // 监听搜索关键词变化，更新搜索建议
+    const updateSearchSuggestions = () => {
+      if (searchKeyword.value.trim()) {
+        // 过滤搜索建议
+        searchSuggestions.value = mockSuggestions.filter(item => 
+          item.toLowerCase().includes(searchKeyword.value.toLowerCase())
+        )
+      } else {
+        searchSuggestions.value = []
+      }
     }
     
-    const handleSearch = (keyword) => {
-      console.log('搜索关键词:', keyword)
-      // 搜索逻辑已在组件内部处理
-    }
-    
-    // 加载搜索数据
-    const loadSearchData = () => {
-      // 实际项目中这里应该从API获取商品数据
-      // 现在使用模拟数据
-      searchItems.value = [...mockBoxes]
-    }
-    
-    onMounted(() => {
-      loadSearchData()
+    // 添加搜索关键词的监听器
+    watch(searchKeyword, () => {
+      updateSearchSuggestions()
     })
+    
+    // 处理搜索
+    const handleSearch = () => {
+      const keyword = searchKeyword.value.trim()
+      if (keyword) {
+        showSearchSuggestions.value = false
+        // 跳转到商城页面并带上搜索参数
+        router.push({
+          path: '/shop',
+          query: { search: keyword }
+        })
+      }
+    }
+
+    // 选择搜索建议
+    const selectSuggestion = (suggestion) => {
+      searchKeyword.value = suggestion
+      handleSearch()
+    }
+
+    // 处理搜索框失焦
+    const handleSearchBlur = () => {
+      // 延迟隐藏，以便用户可以点击建议
+      setTimeout(() => {
+        showSearchSuggestions.value = false
+      }, 200)
+    }
+
+    // 下拉菜单延迟控制
+    let dropdownTimer = null
+    
+    const handleMouseEnter = () => {
+      // 清除可能存在的定时器
+      if (dropdownTimer) {
+        clearTimeout(dropdownTimer)
+      }
+      showDropdown.value = true
+    }
+    
+    const handleMouseLeave = () => {
+      // 延迟关闭，给用户足够时间移动鼠标
+      dropdownTimer = setTimeout(() => {
+        showDropdown.value = false
+      }, 500) // 500毫秒延迟，足够用户移动鼠标
+    }
+    
+    const handleMenuMouseEnter = () => {
+      // 当鼠标进入下拉菜单时，清除定时器
+      if (dropdownTimer) {
+        clearTimeout(dropdownTimer)
+      }
+      showDropdown.value = true
+    }
+    
+    const handleMenuMouseLeave = () => {
+      // 当下拉菜单失去焦点时，延迟关闭
+      dropdownTimer = setTimeout(() => {
+        showDropdown.value = false
+      }, 200)
+    }
+    
+    const handleLogout = () => {
+      if (confirm('确定要退出登录吗？')) {
+        store.dispatch('logout')
+        router.push('/')
+      }
+    }
 
     return {
-      searchItems,
+      searchKeyword,
+      showSearchSuggestions,
+      searchSuggestions,
+      showDropdown,
       isMobile,
       isLoggedIn,
       username,
-      nickname,
+      userNickname,
       avatar,
       logoImage,
       imageError,
       shouldHideNav,
+      handleSearch,
+      selectSuggestion,
+      handleSearchBlur,
+      updateSearchSuggestions,
       handleImageError,
       handleAvatarError,
       handleLogout,
-      handleSearch
+      handleMouseEnter,
+      handleMouseLeave,
+      handleMenuMouseEnter,
+      handleMenuMouseLeave
     }
   }
 }
@@ -189,43 +251,80 @@ export default {
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   object-fit: cover;
-  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-/* 默认情况下（桌面端）实现鼠标悬停显示下拉菜单 */
-.dropdown:hover .dropdown-menu {
+.user-dropdown:hover .user-avatar {
+  transform: scale(1.1);
+}
+
+.user-dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  margin-top: 8px;
+  min-width: 160px;
   display: block;
-  margin-top: 0;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.1);
+  animation: fadeIn 0.2s ease;
 }
 
-/* 确保下拉菜单正常显示 */
-.dropdown-menu {
-  margin-top: 0.5rem;
-}
-
-/* 桌面端强制使用悬停显示 */
-@media (min-width: 769px) {
-  .dropdown-menu {
-    display: none;
-  }
-  
-  .dropdown:hover .dropdown-menu {
-    display: block;
-  }
-}
-
-/* 昵称显示样式 */
-.dropdown-item:disabled {
-  color: #6c757d;
-  background-color: transparent;
+.user-dropdown .dropdown-header {
+  padding: 12px 16px;
   font-weight: 500;
+  color: var(--primary-purple);
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .search-container {
   max-width: 400px;
+  position: relative;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
 }
 
 .nav-link {
@@ -246,11 +345,6 @@ export default {
 
   .search-container {
     max-width: 200px;
-  }
-  
-  /* 移动端移除悬停效果，保持点击交互 */
-  .dropdown:hover .dropdown-menu {
-    display: none;
   }
 }
 </style>

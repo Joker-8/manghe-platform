@@ -10,17 +10,12 @@ export default defineConfig({
         }
     },
     server: {
-        port: 5174,
-        host: true,
-        strictPort: true,
-        logLevel: 'info',
-        // 启用代理配置，将API请求转发到后端服务器
+        port: 5173,
         proxy: {
             '/api': {
                 target: 'http://localhost:3004',
                 changeOrigin: true
             }
         }
-    },
-    logLevel: 'info'
+    }
 })

@@ -1,6 +1,6 @@
 <template>
   <div class="box-card mb-4">
-    <div class="card h-100 position-relative" @click="navigateToDetail">
+    <div class="card h-100 position-relative cursor-pointer" @click="navigateToDetail">
       <!-- 商品图片 -->
       <div class="card-img-container position-relative overflow-hidden">
         <img
@@ -59,8 +59,11 @@
           <button
               class="btn btn-outline-secondary w-100"
               @click.stop="addToWishlist"
+              :class="{ 'active': isFavorited }"
           >
-            加入心愿单
+            <i v-if="isFavorited" class="bi bi-heart-fill text-danger mr-1"></i>
+            <i v-else class="bi bi-heart mr-1"></i>
+            {{ isFavorited ? '已在心愿单' : '加入心愿单' }}
           </button>
         </div>
       </div>
@@ -90,14 +93,8 @@ export default {
       return store.state.favorites.includes(props.boxData.id)
     })
 
-    // 商品卡片点击跳转详情页
-    const navigateToDetail = () => {
-      router.push(`/product/${props.boxData.id}`)
-    }
-
     const toggleFavorite = () => {
       if (!store.getters.isLoggedIn) {
-        // 跳转到登录页面
         router.push('/login')
         return
       }
@@ -109,55 +106,89 @@ export default {
       }
     }
 
-    const handleBuy = async () => {
+    const navigateToDetail = () => {
+      // 确保boxData.id存在
+      if (props.boxData && props.boxData.id) {
+        router.push(`/product/${props.boxData.id}`)
+      }
+    }
+
+    const handleBuy = () => {
       if (!store.getters.isLoggedIn) {
-        // 跳转到登录页面
         router.push('/login')
         return
       }
-      
-      try {
-        // 调用createOrder action创建订单
-        const result = await store.dispatch('createOrder', {
-          productId: props.boxData.id,
+      // 立即购买直接跳转到订单确认页面
+      if (props.boxData && props.boxData.id) {
+        // 创建临时订单数据
+        const orderItem = {
+          id: props.boxData.id,
+          name: props.boxData.name,
+          series: props.boxData.series,
+          image: props.boxData.image,
+          price: props.boxData.price,
           quantity: 1
-        })
-        
-        if (result.success) {
-          console.log('购买成功:', result.data)
-          // 可以添加购买成功后的提示和页面跳转
-          router.push('/orders')
-        } else {
-          console.error('购买失败:', result.message)
-          alert(`购买失败: ${result.message}`)
         }
-      } catch (error) {
-        console.error('购买过程中发生错误:', error)
-        alert('购买过程中发生错误，请重试')
+        // 保存到store
+        store.commit('ADD_TO_CART', orderItem)
+        // 跳转到订单确认页面
+        router.push('/order-confirm')
       }
     }
 
     const addToWishlist = () => {
       if (!store.getters.isLoggedIn) {
-        // 跳转到登录页面
-        router.push('/login')
+        router.push({
+          path: '/login',
+          query: { redirect: `/product/${props.boxData.id}` }
+        })
         return
       }
       
-      // 添加到心愿单
-      if (!isFavorited.value) {
-        store.commit('ADD_FAVORITE', props.boxData.id)
-        console.log('已添加到心愿单:', props.boxData)
+      // 检查是否已经在心愿单中
+      if (isFavorited.value) {
+        // 已在心愿单中，移除
+        store.commit('REMOVE_FAVORITE', props.boxData.id)
+        // 可以添加提示
+        showToast('已从心愿单移除')
       } else {
-        console.log('商品已在心愿单中:', props.boxData)
+        // 不在心愿单中，添加
+        store.commit('ADD_FAVORITE', props.boxData.id)
+        // 存储完整的商品信息（在实际应用中可能会单独保存到Vuex模块）
+        if (store.commit && typeof store.commit === 'function') {
+          try {
+            store.commit('ADD_FAVORITE_ITEM', props.boxData)
+          } catch (e) {
+            // 如果ADD_FAVORITE_ITEM mutation不存在，静默忽略
+          }
+        }
+        // 可以添加提示
+        showToast('已添加到心愿单')
       }
+    }
+    
+    // 简单的提示函数
+    const showToast = (message) => {
+      // 在实际项目中，这里可以使用更完善的Toast组件
+      const toast = document.createElement('div')
+      toast.className = 'toast-message position-fixed top-20 left-50 transform -translate-x-50 bg-dark text-white px-4 py-2 rounded shadow-lg z-50'
+      toast.textContent = message
+      document.body.appendChild(toast)
+      
+      setTimeout(() => {
+        toast.style.opacity = '0'
+        toast.style.transition = 'opacity 0.3s ease'
+        setTimeout(() => {
+          document.body.removeChild(toast)
+        }, 300)
+      }, 2000)
     }
 
     return {
       imageLoaded,
       isFavorited,
-      navigateToDetail,
       toggleFavorite,
+      navigateToDetail,
       handleBuy,
       addToWishlist
     }
@@ -179,6 +210,16 @@ export default {
 
 .box-card:hover .card-img-top {
   transform: scale(1.05);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(107, 33, 168, 0.15);
+  transition: all 0.3s ease;
 }
 
 .btn-like {

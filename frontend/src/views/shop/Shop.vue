@@ -21,8 +21,9 @@
                 class="form-control search-input" 
                 placeholder="搜索盲盒名称或系列..." 
                 v-model="searchQuery"
+                @keyup.enter="handleSearch"
               >
-              <button class="btn btn-primary search-btn" type="button">搜索</button>
+              <button class="btn btn-primary search-btn" type="button" @click="handleSearch">搜索</button>
             </div>
           </div>
           
@@ -89,7 +90,7 @@
 
 <script>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import BoxCard from '@/components/common/BoxCard.vue'
 import CategorySidebar from '@/components/common/CategorySidebar.vue'
 
@@ -101,6 +102,7 @@ export default {
   },
   setup() {
     const route = useRoute()
+    const router = useRouter()
     
     // 响应式数据
     const boxes = ref([])
@@ -407,62 +409,55 @@ export default {
       currentPage.value = 1 // 重置到第一页
     }
     
-    // 更新侧边栏位置，确保它在页尾出现时能正确贴合
+    // 检查页尾导航栏可见性并计算侧边栏位置
     const updateSidebarPosition = () => {
       if (!sidebarElement.value) return
       
-      const sidebar = sidebarElement.value
-      // 获取页尾元素
-      const footer = document.querySelector('footer.main-footer')
-      
+      // 获取页尾导航栏元素
+      const footer = document.querySelector('footer') || document.querySelector('.footer') || document.querySelector('#footer')
       if (!footer) {
-        // 没有页尾时，重置位置
-        document.documentElement.style.setProperty('--sidebar-transform', 'none')
-        document.documentElement.style.setProperty('--sidebar-margin-bottom', '0px')
+        // 没有页尾时，保持侧边栏固定在顶部
+        document.documentElement.style.setProperty('--footer-distance', '0px')
+        document.documentElement.style.setProperty('--is-footer-visible', '0')
         return
       }
       
-      // 获取视口高度和滚动位置
+      // 获取必要的尺寸和位置信息
       const viewportHeight = window.innerHeight
-      const scrollTop = window.scrollY
-      
-      // 获取页尾元素的位置信息
-      const footerOffsetTop = footer.offsetTop
+      const scrollY = window.scrollY
+      const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '60px')
+      const footerTop = footer.offsetTop
       const footerHeight = footer.offsetHeight
       
-      // 获取侧边栏容器的位置信息
-      const sidebarOffsetTop = sidebar.offsetTop
-      const sidebarHeight = sidebar.offsetHeight
+      // 计算从视口顶部到页尾顶部的最大可用高度
+      // 精确计算，确保侧边栏底部与页尾顶部完全对齐
+      // 考虑滚动位置和视口高度，确保计算准确
+      const maxSidebarHeight = footerTop - headerHeight
+      // 设置CSS变量，使用负值调整以确保完全对齐
+      document.documentElement.style.setProperty('--max-sidebar-height', `${maxSidebarHeight}px`)
       
-      // 获取header高度
-      const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '60px')
+      // 使用getBoundingClientRect更精确地获取侧边栏尺寸和位置
+      const sidebarRect = sidebarElement.value.getBoundingClientRect()
+      const sidebarHeight = sidebarRect.height
       
-      // 计算理想的侧边栏底部位置
-      const sidebarBottomTarget = footerOffsetTop - 1 // -1px确保完全贴紧
+      // 优化侧边栏底部位置计算，使用getBoundingClientRect获取精确位置
+      // 直接计算侧边栏底部相对于页面顶部的绝对位置
+      const sidebarBottom = sidebarRect.top + scrollY + sidebarHeight
+      const distanceToFooter = footerTop - sidebarBottom
       
-      // 计算当前滚动位置下侧边栏的底部位置
-      const sidebarBottomCurrent = scrollTop + headerHeight + sidebarHeight
+      // 判断页尾是否即将进入视口
+      const footerVisible = distanceToFooter <= 0
+      document.documentElement.style.setProperty('--is-footer-visible', footerVisible ? '1' : '0')
       
-      // 计算需要的偏移量
-      let translateY = 0
+      // 精确计算侧边栏需要向上移动的距离
+      // 当页尾可见时，确保侧边栏底部与页尾顶部完全对齐，无任何间隙
+      // 添加1px的微调以确保完全贴紧
+      const translateY = footerVisible ? -(distanceToFooter + 1) : 0
+      document.documentElement.style.setProperty('--sidebar-translate-y', `${translateY}px`)
       
-      // 如果侧边栏底部超过页尾顶部，向上移动侧边栏
-      if (sidebarBottomCurrent > sidebarBottomTarget) {
-        translateY = sidebarBottomTarget - sidebarBottomCurrent
-      }
-      
-      // 应用变换
-      document.documentElement.style.setProperty('--sidebar-transform', `translateY(${translateY}px)`)
-      
-      // 确保侧边栏不会因为变换而被截断
-      document.documentElement.style.setProperty('--sidebar-margin-bottom', '0px')
-      
-      // 同时调整max-height，提供双重保障
-      const availableHeight = Math.min(
-        viewportHeight - headerHeight,
-        footerOffsetTop - sidebarOffsetTop
-      )
-      document.documentElement.style.setProperty('--max-sidebar-height', `${availableHeight}px`)
+      // 记录页尾可见高度，用于调试和响应式调整
+      const visibleFooterHeight = Math.max(0, viewportHeight + scrollY - footerTop)
+      document.documentElement.style.setProperty('--visible-footer-height', `${visibleFooterHeight}px`)
     }
     
     // 重置所有筛选条件
@@ -677,21 +672,12 @@ export default {
     const handleUrlParams = () => {
       const filter = route.query.filter
       const series = route.query.series
-      const search = route.query.search
       
-      // 只重置非搜索相关的筛选条件
-      if (!search) {
-        sidebarFilters.value = {
-          category: '',
-          subcategory: '',
-          rarities: [],
-          priceRange: ''
-        }
-        currentPage.value = 1 // 重置到第一页
-      }
+      // 重置当前筛选条件
+      resetAllFilters()
       
       // 根据URL参数设置筛选条件
-      if (filter && !search) {
+      if (filter) {
         switch (filter) {
           case 'hot':
             sidebarFilters.value.category = 'hot'
@@ -706,7 +692,7 @@ export default {
             sidebarFilters.value.category = 'preorder'
             break
         }
-      } else if (series && !search) {
+      } else if (series) {
         // 处理系列筛选
         sidebarFilters.value.category = 'series'
         const subcategoryId = `series-${mockCategories[0].subcategories.findIndex(s => 
@@ -715,19 +701,39 @@ export default {
         sidebarFilters.value.subcategory = subcategoryId
       }
       
-      // 如果有搜索参数，不重置页码，保持当前页码
+      currentPage.value = 1
     }
     
-    // 监听URL参数变化
-    watch(() => route.query, () => {
-      handleUrlParams()
-    }, { immediate: true })
-    
-    // 监听搜索参数变化
-    watch(() => route.query.search, (newSearch) => {
-      if (newSearch) {
-        searchQuery.value = newSearch
+    // 处理搜索
+    const handleSearch = () => {
+      const keyword = searchQuery.value.trim()
+      if (keyword) {
+        // 重置到第一页
+        currentPage.value = 1
+        // 更新路由参数
+        router.push({
+          query: {
+            ...route.query,
+            search: keyword
+          }
+        })
+      } else {
+        // 如果搜索框为空，移除搜索参数
+        const query = { ...route.query }
+        delete query.search
+        router.push({ query })
       }
+    }
+
+    // 监听URL参数变化
+    watch(() => route.query, (newQuery) => {
+      handleUrlParams()
+      // 从路由参数获取搜索关键词
+      if (newQuery.search) {
+        searchQuery.value = newQuery.search
+      }
+      // 重置到第一页
+      currentPage.value = 1
     }, { immediate: true })
     
     // 组件挂载时获取数据
@@ -766,6 +772,7 @@ export default {
       paginatedBoxes,
       totalPages,
       fetchBoxes,
+      handleSearch,
       sidebarFilters,
       handleFiltersChange,
       resetAllFilters,
@@ -824,17 +831,13 @@ export default {
     min-height: 0;
     
     /* 添加平滑过渡效果 */
-    transition: transform 0.2s ease-out;
+    transition: transform 0.3s ease-out;
     transform: translateY(var(--sidebar-translate-y, 0px));
     overflow-y: auto;
     
     /* 确保滚动条样式统一 */
     scrollbar-width: thin;
     scrollbar-color: #cbd5e0 #f1f5f9;
-    
-    /* 移除任何可能导致间隙的边框 */
-    border: none;
-    outline: none;
   }
 
 /* 自定义滚动条样式 */

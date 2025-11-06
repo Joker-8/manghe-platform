@@ -87,7 +87,8 @@
           <div v-for="box in recommendedBoxes"
                :key="box.id"
                class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-            <div class="box-card cursor-pointer" @click="navigateToDetail(box)">
+            <div class="box-card cursor-pointer"
+                 @click="navigateToDetail(box.id)">
               <div class="card h-100 position-relative">
                 <div class="card-img-container position-relative overflow-hidden">
                   <img
@@ -136,7 +137,7 @@
                     </button>
                     <button
                         class="btn btn-outline-secondary w-100"
-                        @click.stop="addToWishlist(box)"
+                        @click="addToWishlist(box)"
                     >
                       加入心愿单
                     </button>
@@ -222,7 +223,27 @@ export default {
 
     // 处理轮播图点击事件
     const handleBannerClick = (banner) => {
-      router.push(banner.link)
+      // 确保精确导航到对应商城分类
+      router.push({
+        path: '/shop',
+        query: parseBannerLink(banner.link)
+      })
+    }
+    
+    // 解析轮播图链接，提取查询参数
+    const parseBannerLink = (link) => {
+      const queryParams = {}
+      // 从链接中提取查询参数部分
+      const queryString = link.split('?')[1]
+      if (queryString) {
+        queryString.split('&').forEach(param => {
+          const [key, value] = param.split('=')
+          if (key && value) {
+            queryParams[key] = decodeURIComponent(value)
+          }
+        })
+      }
+      return queryParams
     }
 
     // 处理轮播图图片加载错误
@@ -237,6 +258,11 @@ export default {
       console.error(`盲盒 ${boxId} 图片加载失败`)
       // 使用SVG占位图
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTlBQUZGIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPuaTjeS9nOivleWbviDlm77niYc8L3RleHQ+Cjwvc3ZnPgo='
+    }
+    
+    // 导航到商品详情页
+    const navigateToDetail = (boxId) => {
+      router.push(`/product/${boxId}`)
     }
 
     // 模拟获取推荐盲盒数据
@@ -291,8 +317,20 @@ export default {
     }
 
     const handleBuy = (boxData) => {
-      // 与navigateToDetail方法行为一致，点击跳转到商品详情页
-      router.push(`/product/${boxData.id}`)
+      if (!store.getters.isLoggedIn) {
+        // 未登录，跳转到登录页面
+        router.push({
+          path: '/login',
+          query: { redirect: `/product/${boxData.id}?buyNow=true` }
+        })
+        return
+      }
+      
+      // 已登录，带buyNow参数跳转到商品详情页
+      router.push({
+        path: `/product/${boxData.id}`,
+        query: { buyNow: 'true' }
+      })
     }
 
     const addToWishlist = (boxData) => {
@@ -300,22 +338,8 @@ export default {
         router.push('/login')
         return
       }
-      
-      // 添加到心愿单
-      if (!store.state.favorites.includes(boxData.id)) {
-        store.commit('ADD_FAVORITE', boxData.id)
-        console.log('已添加到心愿单:', boxData)
-        alert('已添加到心愿单')
-      } else {
-        console.log('商品已在心愿单中:', boxData)
-        alert('商品已在心愿单中')
-      }
-    }
-    
-    // 处理商品卡片点击事件，跳转到商品详情页
-    const navigateToDetail = (boxData) => {
-      // 与navigateToDetail方法行为一致，点击跳转到商品详情页
-      router.push(`/product/${boxData.id}`)
+      console.log('添加到心愿单:', boxData)
+      // 添加到心愿单逻辑
     }
 
     onMounted(() => {

@@ -60,19 +60,46 @@
           <div class="d-flex align-items-start">
             <img :src="currentUser.avatar" class="user-avatar me-3" alt="用户头像">
             <div class="flex-grow-1">
+              <!-- 评论输入框 -->
               <textarea
                   v-model="newComment"
                   class="form-control comment-input"
                   placeholder="写下你的评论..."
                   rows="2"
+                  :maxlength="maxCommentLength"
+                  @input="handleCommentInput"
               ></textarea>
-              <div class="comment-options mt-2">
+              
+              <!-- 评论预览 -->
+              <div v-if="showPreview && newComment.trim()" class="comment-preview mt-3 p-2 bg-light rounded">
+                <div class="comment-header mb-1">
+                  <strong class="comment-author">预览</strong>
+                </div>
+                <p class="comment-content mb-0">{{ newComment.trim() }}</p>
+              </div>
+              
+              <!-- 评论选项和字数限制 -->
+              <div class="comment-options mt-2 d-flex justify-content-between align-items-center">
+                <div class="comment-stats">
+                  <span 
+                    class="word-count"
+                    :class="{ 'text-danger': commentLength > maxCommentLength * 0.9 }"
+                  >
+                    {{ commentLength }}/{{ maxCommentLength }}
+                  </span>
+                  <button 
+                    class="btn btn-link btn-sm p-0 text-muted ms-3"
+                    @click="togglePreview"
+                  >
+                    {{ showPreview ? '隐藏预览' : '预览' }}
+                  </button>
+                </div>
                 <button
                     class="btn btn-primary btn-sm"
                     @click="addComment"
-                    :disabled="!newComment.trim()"
+                    :disabled="!newComment.trim() || commentLength > maxCommentLength || isSubmitting"
                 >
-                  发布
+                  {{ isSubmitting ? '发布中...' : '发布' }}
                 </button>
               </div>
             </div>
@@ -99,40 +126,92 @@ export default {
   setup(props, { emit }) {
     const store = useStore()
     const newComment = ref('')
-
+    const showPreview = ref(false)
+    const maxCommentLength = 200
+    const isSubmitting = ref(false)
+    
+    // 从store获取当前用户信息，如果没有则使用默认值
     const currentUser = ref({
-      id: 1,
-      name: '当前用户',
-      avatar: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM2QjIxQTgiLz4KPHBhdGggZD0iTTIwIDIxQzIyLjIwOTEgMjEgMjQgMTkuMjA5MSAyNCAxN0MyNCAxNC43OTA5IDIyLjIwOTEgMTMgMjAgMTNDMTcuNzkwOSAxMyAxNiAxNC43OTA5IDE2IDE3QzE2IDE5LjIwOTEgMTcuNzkwOSAyMSAyMCAyMVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMCAyMkMxNS41ODIyIDIyIDEyIDI0LjY4NjMgMTIgMjhIMjBIMjhDMjggMjQuNjg2MyAyNC40MTc4IDIyIDIwIDIyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=='
+      id: store.state.user?.id || 1,
+      name: store.state.user?.nickname || store.state.user?.name || '当前用户',
+      avatar: store.state.user?.avatar || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM2QjIxQTgiLz4KPHBhdGggZD0iTTIwIDIxQzIyLjIwOTEgMjEgMjQgMTkuMjA5MSAyNCAxN0MyNCAxNC43OTA5IDIyLjIwOTEgMTMgMjAgMTNDMTcuNzkwOSAxMyAxNiAxNC43OTA5IDE2IDE3QzE2IDE5LjIwOTEgMTcuNzkwOSAyMSAyMCAyMVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMCAyMkMxNS41ODIyIDIyIDEyIDI0LjY4NjMgMTIgMjhIMjBIMjhDMjggMjQuNjg2MyAyNC40MTc4IDIyIDIwIDIyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=='
+    })
+
+    // 计算评论长度
+    const commentLength = computed(() => {
+      return newComment.value.length
     })
 
     const allComments = computed(() => {
-      return [...props.post.commentsList].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      return [...(props.post.commentsList || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     })
 
     const formatTime = (timestamp) => {
-      const now = new Date()
-      const commentTime = new Date(timestamp)
-      const diffInMinutes = Math.floor((now - commentTime) / (1000 * 60))
+      try {
+        const now = new Date()
+        const commentTime = new Date(timestamp)
+        const diffInMinutes = Math.floor((now - commentTime) / (1000 * 60))
 
-      if (diffInMinutes < 1) return '刚刚'
-      if (diffInMinutes < 60) return `${diffInMinutes}分钟前`
-      if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}小时前`
-      return `${Math.floor(diffInMinutes / 1440)}天前`
+        if (diffInMinutes < 1) return '刚刚'
+        if (diffInMinutes < 60) return `${diffInMinutes}分钟前`
+        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}小时前`
+        return `${Math.floor(diffInMinutes / 1440)}天前`
+      } catch (error) {
+        console.error('时间格式化错误:', error)
+        return '刚刚'
+      }
     }
 
-    const addComment = () => {
-      if (!newComment.value.trim()) return
+    // 处理评论输入
+    const handleCommentInput = () => {
+      // 如果超过字数限制，可以在这里进行处理
+      if (commentLength.value > maxCommentLength) {
+        console.warn('评论超过字数限制')
+      }
+    }
 
-      const comment = {
-        id: Date.now(),
-        user: { ...currentUser.value },
-        content: newComment.value.trim(),
-        createdAt: new Date().toISOString()
+    // 切换预览显示
+    const togglePreview = () => {
+      showPreview.value = !showPreview.value
+    }
+
+    // 添加评论
+    const addComment = async () => {
+      // 验证评论内容
+      const trimmedComment = newComment.value.trim()
+      if (!trimmedComment || commentLength.value > maxCommentLength) {
+        return
       }
 
-      emit('comment-added', props.post.id, comment)
-      newComment.value = ''
+      isSubmitting.value = true
+      
+      try {
+        // 模拟异步提交
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
+        const comment = {
+          id: Date.now(),
+          user: { ...currentUser.value },
+          content: trimmedComment,
+          createdAt: new Date().toISOString(),
+          likes: 0,
+          isLiked: false
+        }
+
+        // 发送评论数据到父组件
+        emit('comment-added', props.post.id, comment)
+        
+        // 清空输入和预览
+        newComment.value = ''
+        showPreview.value = false
+        
+        console.log('评论发布成功:', comment)
+      } catch (error) {
+        console.error('评论发布失败:', error)
+        alert('评论发布失败，请重试')
+      } finally {
+        isSubmitting.value = false
+      }
     }
 
     return {
@@ -140,7 +219,13 @@ export default {
       currentUser,
       allComments,
       formatTime,
-      addComment
+      addComment,
+      commentLength,
+      maxCommentLength,
+      showPreview,
+      togglePreview,
+      handleCommentInput,
+      isSubmitting
     }
   }
 }
@@ -261,7 +346,32 @@ export default {
 
 .comment-options {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comment-stats {
+  display: flex;
+  align-items: center;
+}
+
+.word-count {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.comment-preview {
+  border: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  font-size: 0.9rem;
+}
+
+.comment-preview .comment-content {
+  word-break: break-word;
+}
+
+.text-danger {
+  color: #dc3545 !important;
 }
 
 /* 响应式设计 */

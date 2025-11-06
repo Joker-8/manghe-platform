@@ -11,7 +11,9 @@
                 alt="用户头像"
                 @error="handleAvatarError"
             >
-            <h4>{{ userInfo.nickname || '用户' }}</h4>
+            <h4>{{ userInfo.nickname || userInfo.name }}</h4>
+            <p class="text-muted">@{{ userInfo.username }}</p>
+            <p v-if="userInfo.email" class="text-sm text-muted">{{ userInfo.email }}</p>
 
             <!-- 会员等级 -->
             <div class="membership-level mb-3">
@@ -32,8 +34,10 @@
                 <small class="text-muted">动态</small>
               </div>
             </div>
-            <button class="btn btn-outline-primary w-100 mb-2" @click="editProfile">编辑资料</button>
-            <button class="btn btn-danger w-100" @click="showDeleteModal = true">申请注销账号</button>
+            <div class="d-grid gap-2">
+              <router-link to="/edit-profile" class="btn btn-outline-primary w-100">编辑资料</router-link>
+              <button class="btn btn-outline-danger w-100" @click="confirmDeleteAccount">注销账号</button>
+            </div>
           </div>
         </div>
 
@@ -107,6 +111,17 @@
               </div>
             </div>
           </div>
+          <div class="col-md-4 mb-3">
+            <router-link to="/cart" class="stat-card card text-center text-decoration-none">
+              <div class="card-body">
+                <div class="stat-icon text-warning">
+                  <i class="bi bi-cart"></i>
+                </div>
+                <h4 class="text-warning">{{ cartItemCount }}</h4>
+                <p class="text-muted mb-0">购物车</p>
+              </div>
+            </router-link>
+          </div>
         </div>
 
         <!-- 我的订单 -->
@@ -131,17 +146,11 @@
                   <tr v-for="order in recentOrders" :key="order.id">
                     <td>#{{ order.id }}</td>
                     <td>
-                        <div class="d-flex align-items-center">
-                          <img 
-                            :src="getProductImage(order)" 
-                            :alt="order.product || '商品图片'" 
-                            class="order-product-image me-2"
-                            @error="handleImageError($event)"
-                            :data-loaded="false"
-                          >
-                          <span>{{ order.product }}</span>
-                        </div>
-                      </td>
+                      <div class="d-flex align-items-center">
+                        <img :src="order.productImage" :alt="order.product" class="order-product-image me-2">
+                        <span>{{ order.product }}</span>
+                      </div>
+                    </td>
                     <td>¥{{ order.amount }}</td>
                     <td>
                       <span :class="`badge bg-${getStatusClass(order.status)}`">
@@ -149,12 +158,52 @@
                       </span>
                     </td>
                     <td>
-                      <button class="btn btn-sm btn-outline-primary me-1">查看</button>
+                      <router-link :to="{ name: 'order-detail', params: { id: order.id } }" class="btn btn-sm btn-outline-primary me-1">查看</router-link>
                       <button v-if="order.status === '待付款'" class="btn btn-sm btn-success">付款</button>
                     </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 我的心愿单 -->
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">我的心愿单</h5>
+            <span class="text-muted">{{ wishlist.length }} 件商品</span>
+          </div>
+          <div class="card-body">
+            <div v-if="isLoadingWishlist" class="text-center py-4">
+              <div class="spinner-border" role="status"></div>
+              <span class="visually-hidden">加载中...</span>
+            </div>
+            <div v-else-if="wishlist.length === 0" class="text-center py-6">
+              <i class="bi bi-heart display-1 text-muted"></i>
+              <p class="text-muted mt-2">心愿单还是空的</p>
+              <router-link to="/shop" class="btn btn-primary mt-2">去逛逛</router-link>
+            </div>
+            <div v-else class="row">
+              <div v-for="item in wishlist" :key="item.id" class="col-md-4 mb-3">
+                <div class="wishlist-item border rounded p-2 d-flex flex-column h-100">
+                  <div class="relative">
+                    <img :src="item.image" :alt="item.name" class="wishlist-image w-100 rounded mb-2">
+                    <button class="btn btn-sm btn-danger absolute top-1 right-1" @click="removeFromWishlist(item.id)">
+                      <i class="bi bi-heart-fill"></i>
+                    </button>
+                  </div>
+                  <h6 class="text-truncate">{{ item.name }}</h6>
+                  <p class="text-muted small mb-2">{{ item.series }}</p>
+                  <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="price fw-bold text-primary">¥{{ item.price }}</span>
+                      <small class="text-muted">{{ item.addedDate }}</small>
+                    </div>
+                    <router-link :to="`/product/${item.id}`" class="btn btn-sm btn-outline-primary w-100 mt-2">查看详情</router-link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -186,44 +235,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 注销确认模态框 -->
-    <div v-if="showDeleteModal" class="modal fade show" tabindex="-1" role="dialog" style="display: block">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">确认注销账号</h5>
-            <button type="button" class="btn-close" @click="showDeleteModal = false"></button>
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-danger mb-3">
-              <strong>警告：</strong>账号注销后将无法恢复，所有数据将在7天冷静期后被永久删除。
-            </div>
-            <div class="form-group">
-              <label for="confirmText">请输入"确认注销"以继续：</label>
-              <input 
-                id="confirmText" 
-                v-model="confirmText" 
-                type="text" 
-                class="form-control" 
-                placeholder="请输入确认文本"
-              >
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showDeleteModal = false">取消</button>
-            <button 
-              type="button" 
-              class="btn btn-danger" 
-              @click="submitDeleteRequest"
-              :disabled="deletingAccount"
-            >
-              {{ deletingAccount ? '处理中...' : '确认注销' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -237,6 +248,12 @@ export default {
   setup() {
     const store = useStore()
     const router = useRouter()
+    const showEditModal = ref(false)
+    
+    // 计算购物车商品数量
+    const cartItemCount = computed(() => {
+      return store.state.cart ? store.state.cart.length : 0
+    })
 
     const userInfo = ref({})
     const recentOrders = ref([])
@@ -261,48 +278,38 @@ export default {
       return Math.min((current / nextLevelPoints) * 100, 100) + '%'
     })
 
-    // 处理图片加载错误
-    // 处理图片加载错误，避免无限循环
-    const handleImageError = (event) => {
-      const target = event.target;
-      // 如果已经是默认图片或已经尝试过加载，则不再处理
-      if (target.src.includes('default-product.jpg') || target.dataset.loaded === 'true') {
-        return;
+    // 模拟心愿单数据
+    const mockWishlist = [
+      {
+        id: 1,
+        name: '星空幻想系列',
+        series: '第一弹',
+        image: '/images/box1.jpg',
+        price: 89,
+        addedDate: '2024-01-14'
+      },
+      {
+        id: 3,
+        name: '海洋奇缘',
+        series: '特别版',
+        image: '/images/box3.jpg',
+        price: 99,
+        addedDate: '2024-01-12'
+      },
+      {
+        id: 5,
+        name: '童话世界',
+        series: '限定款',
+        image: '/images/box4.jpg',
+        price: 129,
+        addedDate: '2024-01-10'
       }
-      console.error('图片加载失败:', target.src);
-      // 标记已经尝试过加载
-      target.dataset.loaded = 'true';
-      // 使用默认图片
-      target.src = '/images/default-product.jpg';
-    }
+    ]
     
-    // 获取正确的商品图片路径
-    const getProductImage = (order) => {
-      let imagePath = order.productImage || order.product_image || '';
-      
-      // 处理不同的数据格式
-      if (!imagePath && typeof order === 'object') {
-        // 从order对象中提取图片信息
-        imagePath = order.image || order.img || order.picture || '';
-      }
-      
-      // 如果只有文件名，添加正确的路径前缀
-      if (imagePath && !imagePath.startsWith('/images/')) {
-        // 只对box1.jpg使用boxes子目录，其他box图片直接放在images根目录
-        if (imagePath === 'box1.jpg') {
-          imagePath = '/images/boxes/' + imagePath;
-        } else {
-          imagePath = '/images/' + imagePath;
-        }
-      }
-      
-      return imagePath || '/images/default-product.jpg';
-    }
-
-    // 模拟数据 - 仅用于测试用户
+    // 模拟数据
     const mockUserInfo = {
-      nickname: '盲盒爱好者',
       name: '盲盒爱好者',
+      nickname: '盲盒收藏家',
       username: 'boxlover',
       followers: 128,
       following: 56,
@@ -311,6 +318,12 @@ export default {
       level: '黄金会员',
       nextLevel: '钻石会员'
     }
+    
+    // 编辑表单相关功能已迁移到独立的EditProfile页面
+    
+    // 心愿单相关
+    const wishlist = ref([])
+    const isLoadingWishlist = ref(false)
 
     const mockOrders = [
       {
@@ -355,10 +368,6 @@ export default {
       { id: 3, name: '开盒高手', icon: 'bi-gift', unlocked: false },
       { id: 4, name: '社区明星', icon: 'bi-star', unlocked: true }
     ]
-    
-    // 测试用户标识（用于显示模拟数据）
-    const TEST_USERNAME = 'C01';
-    const isTestUser = (username) => username === TEST_USERNAME;
 
     const getStatusClass = (status) => {
       const classes = {
@@ -369,114 +378,102 @@ export default {
       }
       return classes[status] || 'secondary'
     }
+    
+    // 获取心愿单
+    const fetchWishlist = () => {
+      isLoadingWishlist.value = true
+      // 模拟API请求
+      setTimeout(() => {
+        // 从store获取收藏的商品ID
+        const favoriteIds = store.state.favorites || []
+        // 如果有收藏的商品ID，过滤模拟数据
+        if (favoriteIds.length > 0) {
+          wishlist.value = mockWishlist.filter(item => favoriteIds.includes(item.id))
+        } else {
+          // 否则使用模拟数据
+          wishlist.value = mockWishlist
+        }
+        isLoadingWishlist.value = false
+      }, 500)
+    }
+    
+    // 从心愿单中移除
+    const removeFromWishlist = (productId) => {
+      if (!store.getters.isLoggedIn) {
+        return
+      }
+      
+      // 从本地状态中移除
+      wishlist.value = wishlist.value.filter(item => item.id !== productId)
+      
+      // 从store中移除
+      if (store.commit) {
+        store.commit('REMOVE_FAVORITE', productId)
+      }
+    }
 
     const handleAvatarError = (event) => {
       console.error('头像图片加载失败，使用默认头像')
       event.target.src = getDefaultAvatar()
     }
 
-    const editProfile = () => {
-      // 导航到设置页面的基本信息标签
-      router.push('/settings')
-      // 存储要激活的标签页到sessionStorage，以便Settings组件可以读取
-      sessionStorage.setItem('activeTab', 'profile')
-    }
-
-    // 注销账号相关状态和方法
-    const showDeleteModal = ref(false)
-    const confirmText = ref('')
-    const deletingAccount = ref(false)
-    const deleteStatus = ref('')
-
-    const submitDeleteRequest = async () => {
-      if (confirmText.value !== '确认注销') {
-        alert('请输入正确的确认文本')
+    // 注销账号确认
+    const confirmDeleteAccount = () => {
+      if (!confirm('注销账号将删除您的所有数据，此操作不可恢复。确定要继续吗？')) {
         return
       }
 
-      try {
-        deletingAccount.value = true
-        // 获取当前用户ID
-        const userId = store.state.user.id
-        // 调用注销API
-        const response = await fetch(`/api/users/${userId}/delete-request`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${store.state.token}`
-          },
-          body: JSON.stringify({})
-        })
+      if (confirm('再次确认：您确定要永久注销账号吗？')) {
+        deleteAccount()
+      }
+    }
 
-        if (response.ok) {
-          const data = await response.json()
-          // 设置7天冷静期
-          const 冷静期天数 = 7
-          deleteStatus.value = `账号注销申请已提交，将在${冷静期天数}天后生效`
-          showDeleteModal.value = false
-          alert('账号注销申请已提交，请在7天冷静期内考虑是否取消注销')
-        } else {
-          const error = await response.json()
-          console.error('注销申请失败:', error)
-          alert('注销申请失败，请稍后重试')
+    // 注销账号
+    const deleteAccount = async () => {
+      try {
+        // 模拟API请求
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        
+        // 清除用户数据并退出登录
+        if (store.commit) {
+          store.commit('LOGOUT')
         }
+        
+        // 重定向到首页
+        router.push('/')
+        
+        // 显示注销成功提示
+        setTimeout(() => {
+          alert('账号已成功注销')
+        }, 500)
       } catch (error) {
-        console.error('提交注销申请时出错:', error)
-        alert('网络错误，请稍后重试')
-      } finally {
-        deletingAccount.value = false
-        confirmText.value = ''
+        console.error('注销账号失败:', error)
+        alert('注销失败，请重试')
       }
     }
 
     onMounted(() => {
       // 如果store中有用户信息，使用store中的数据
       if (store.state.user) {
-        // 基础用户信息始终从store获取
         userInfo.value = {
-          nickname: store.state.user.nickname || '',
-          name: store.state.user.name || store.state.user.username || '',
-          username: store.state.user.username || '',
-          followers: store.state.user.followers || 0,
-          following: store.state.user.following || 0,
-          posts: store.state.user.posts || 0,
-          points: store.state.user.points || 0,
-          level: store.state.user.level || '普通会员',
-          nextLevel: store.state.user.nextLevel || '白银会员'
-        }
-        
-        // 只有测试用户才使用模拟数据
-        const username = store.state.user.username || '';
-        if (isTestUser(username)) {
-          recentOrders.value = mockOrders;
-          activities.value = mockActivities;
-          stats.value = mockStats;
-          achievements.value = mockAchievements;
-        } else {
-          // 非测试用户使用空数据或从store获取
-          recentOrders.value = store.state.orders || [];
-          activities.value = store.state.activities || [];
-          stats.value = store.state.stats || { totalBoxes: 0, collections: 0, communityPosts: 0 };
-          achievements.value = store.state.achievements || [];
+          ...mockUserInfo,
+          name: store.state.user.username || mockUserInfo.name,
+          nickname: store.state.user.nickname || mockUserInfo.nickname,
+          username: store.state.user.username || mockUserInfo.username,
+          points: store.state.user.points || mockUserInfo.points,
+          level: store.state.user.level || mockUserInfo.level
         }
       } else {
-        // 未登录状态显示空数据
-        userInfo.value = {
-          nickname: '',
-          name: '',
-          username: '',
-          followers: 0,
-          following: 0,
-          posts: 0,
-          points: 0,
-          level: '普通会员',
-          nextLevel: '白银会员'
-        }
-        recentOrders.value = []
-        activities.value = []
-        stats.value = { totalBoxes: 0, collections: 0, communityPosts: 0 }
-        achievements.value = []
+        userInfo.value = mockUserInfo
       }
+
+      recentOrders.value = mockOrders
+      activities.value = mockActivities
+      stats.value = mockStats
+      achievements.value = mockAchievements
+      
+      // 获取心愿单数据
+      fetchWishlist()
     })
 
     return {
@@ -485,18 +482,15 @@ export default {
       activities,
       stats,
       achievements,
+      wishlist,
+      isLoadingWishlist,
       userAvatar,
       progressWidth,
-      handleImageError,
       getStatusClass,
       handleAvatarError,
-      editProfile,
-      showDeleteModal,
-      confirmText,
-      deletingAccount,
-      deleteStatus,
-      submitDeleteRequest,
-      getProductImage
+      removeFromWishlist,
+      confirmDeleteAccount,
+      cartItemCount
     }
   }
 }
@@ -510,6 +504,39 @@ export default {
   border: 3px solid var(--primary-purple);
 }
 
+/* 个人中心样式 */
+.profile-page {
+  padding-top: 70px; /* 为固定导航栏留出空间 */
+}
+
+.profile-page .btn {
+  transition: all 0.3s ease;
+}
+
+.profile-page .btn:hover {
+  transform: translateY(-2px);
+}
+
+
+.avatar-uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.edit-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.upload-btn {
+  min-width: 120px;
+}
+
 .stat-card {
   transition: transform 0.3s ease;
 }
@@ -518,9 +545,20 @@ export default {
   transform: translateY(-5px);
 }
 
-.stat-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+.stat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+.wishlist-image {
+  height: 150px;
+  object-fit: cover;
+}
+
+.wishlist-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wishlist-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .order-product-image {

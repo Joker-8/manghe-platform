@@ -34,7 +34,7 @@ export default {
     const hideNavRoutes = ['login', 'register']
 
     // 需要显示底部导航的路由
-    const footerRoutes = ['home', 'shop', 'collection', 'community', 'about', 'product']
+    const footerRoutes = ['home', 'shop', 'collection', 'community', 'about', 'product', 'privacy-policy', 'terms-of-service', 'legal-notice']
 
     // 需要显示移动端标签栏的路由
     const mobileTabRoutes = ['home', 'shop', 'open', 'community', 'profile']

@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
@@ -29,19 +29,12 @@ api.interceptors.response.use(
   response => response.data,
   error => {
     console.error('API请求错误:', error.message || error)
-    
-    // 构建更详细的错误对象，包含后端返回的错误信息
-    const errorObj = {
+    // 返回一个统一的错误对象，方便上层处理
+    return Promise.reject({
+      message: error.message || '网络请求失败',
       status: error.response?.status || 0,
-      originalError: error,
-      // 优先使用后端返回的错误信息
-      message: error.response?.data?.message || 
-               error.response?.data?.error ||
-               error.message ||
-               (error.code === 'ECONNREFUSED' ? '服务器连接失败，请检查服务器是否运行' : '网络请求失败')
-    }
-    
-    return Promise.reject(errorObj)
+      originalError: error
+    })
   }
 )
 
@@ -54,7 +47,7 @@ export const syncApi = {
       if (!userId) {
         throw new Error('用户ID不能为空')
       }
-      const response = await api.get(`/users/${userId}/sync`)
+      const response = await api.get(`/sync/user/${userId}`)
       return response
     } catch (error) {
       console.error('获取用户同步数据失败:', error.message || error)
@@ -69,7 +62,7 @@ export const syncApi = {
       if (!userId) {
         throw new Error('用户ID不能为空')
       }
-      const response = await api.post(`/users/${userId}/sync`, data)
+      const response = await api.post(`/sync/user/${userId}`, data)
       return response
     } catch (error) {
       console.error('同步客户端数据失败:', error.message || error)
@@ -89,14 +82,9 @@ export const syncApi = {
   },
   
   // 手机号验证码登录/注册
-  async phoneLogin({ phone, code, username, nickname }) {
+  async phoneLogin({ phone, code }) {
     try {
-      const response = await api.post('/auth/phone-login', { 
-        phone, 
-        code,
-        username, // 传递用户名
-        nickname  // 传递昵称
-      })
+      const response = await api.post('/auth/phone-login', { phone, code })
       return response
     } catch (error) {
       console.error('手机号登录失败:', error)

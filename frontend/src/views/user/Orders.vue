@@ -67,38 +67,32 @@
 
                 <!-- 订单内容 -->
                 <div class="order-content p-3 border border-top-0 rounded-bottom">
-                  <div v-if="order.items && Array.isArray(order.items)">
-                    <div v-for="item in order.items" :key="item.id" class="order-product mb-3">
-                      <div class="row align-items-center">
-                        <div class="col-md-6">
-                          <div class="d-flex align-items-center">
-                            <img :src="item.image || '/images/default-product.jpg'" :alt="item.name || '商品图片'" class="product-image me-3">
-                            <div>
-                              <h6 class="mb-1">{{ item.name || '商品名称' }}</h6>
-                              <p class="text-muted small mb-0">{{ item.series || '暂无系列信息' }}</p>
-                              <span class="badge bg-light text-dark">{{ item.quantity || 1 }}个</span>
-                            </div>
+                  <div v-for="item in order.items" :key="item.id" class="order-product mb-3">
+                    <div class="row align-items-center">
+                      <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                          <img :src="item.image" :alt="item.name" class="product-image me-3">
+                          <div>
+                            <h6 class="mb-1">{{ item.name }}</h6>
+                            <p class="text-muted small mb-0">{{ item.series }}</p>
+                            <span class="badge bg-light text-dark">{{ item.quantity }}个</span>
                           </div>
                         </div>
-                        <div class="col-md-2 text-center">
-                          <span class="text-muted">单价</span>
-                          <div class="fw-bold">¥{{ item.price || 0 }}</div>
-                        </div>
-                        <div class="col-md-2 text-center">
-                          <span class="text-muted">小计</span>
-                          <div class="fw-bold">¥{{ ((item.price || 0) * (item.quantity || 1)).toFixed(2) }}</div>
-                        </div>
-                        <div class="col-md-2 text-end">
-                          <button class="btn btn-outline-primary btn-sm me-1" @click="viewProduct(item)">
-                            查看商品
-                          </button>
-                        </div>
+                      </div>
+                      <div class="col-md-2 text-center">
+                        <span class="text-muted">单价</span>
+                        <div class="fw-bold">¥{{ item.price }}</div>
+                      </div>
+                      <div class="col-md-2 text-center">
+                        <span class="text-muted">小计</span>
+                        <div class="fw-bold">¥{{ item.price * item.quantity }}</div>
+                      </div>
+                      <div class="col-md-2 text-end">
+                        <button class="btn btn-outline-primary btn-sm me-1" @click="viewProduct(item)">
+                          查看商品
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  <!-- 处理无商品信息情况 -->
-                  <div v-else class="text-center py-3 text-muted">
-                    暂无商品信息
                   </div>
 
                   <!-- 订单总计 -->
@@ -119,7 +113,7 @@
                     </div>
                     <div class="total-amount">
                       <span class="text-muted me-2">合计:</span>
-                      <span class="h5 text-primary mb-0">¥{{ (order.totalAmount || order.total_amount || 0).toFixed(2) }}</span>
+                      <span class="h5 text-primary mb-0">¥{{ order.totalAmount }}</span>
                     </div>
                   </div>
                 </div>
@@ -150,13 +144,11 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
 
 export default {
   name: 'OrdersPage',
   setup() {
     const router = useRouter()
-    const store = useStore()
 
     const orders = ref([])
     const statusFilter = ref('')
@@ -164,13 +156,7 @@ export default {
     const currentPage = ref(1)
     const pageSize = 5
 
-    // 测试用户标识
-    const TEST_USERNAME = 'C01';
-    const isTestUser = () => {
-      return store.state.user && store.state.user.username === TEST_USERNAME;
-    };
-
-    // 模拟订单数据 - 仅用于测试用户
+    // 模拟订单数据
     const mockOrders = [
       {
         id: 1,
@@ -366,7 +352,8 @@ export default {
 
     const viewOrderDetail = (order) => {
       console.log('查看订单详情:', order)
-      router.push(`/orders/${order.id}`)
+      // 跳转到订单详情页
+      router.push(`/order/${order.id}`)
     }
 
     const viewProduct = (product) => {
@@ -374,84 +361,9 @@ export default {
       router.push('/shop')
     }
 
-    // 获取订单商品总数
-    const getTotalItems = (order) => {
-      if (order.items && Array.isArray(order.items) && order.items.length > 0) {
-        return order.items.reduce((total, item) => total + (item.quantity || 0), 0);
-      } else if (order.quantity) {
-        return order.quantity;
-      }
-      return 0;
-    };
-    
-    // 获取订单数据
-    const fetchOrders = async () => {
-      try {
-        // 先调用store action获取最新订单数据
-        await store.dispatch('fetchOrders');
-        
-        // 从store获取订单数据
-        let ordersData = [];
-        // 处理不同的store结构可能性
-        if (store.state.orders && Array.isArray(store.state.orders)) {
-          ordersData = store.state.orders;
-        } else if (store.state.orders && store.state.orders.orders) {
-          ordersData = store.state.orders.orders;
-        }
-        
-        // 只有测试用户才使用模拟数据
-        if (isTestUser()) {
-          orders.value = [...mockOrders, ...ordersData];
-        } else {
-          // 非测试用户从store获取最新数据
-          orders.value = ordersData;
-          
-          // 如果store中没有数据，且用户已登录，提供友好提示
-          if (orders.value.length === 0 && store.state.user) {
-            console.log('暂无订单数据');
-          }
-        }
-        
-        // 确保每个订单都有必要的字段
-        orders.value = orders.value.map(order => ({
-          ...order,
-          id: order.id || Math.floor(Math.random() * 10000),
-          orderNumber: order.orderNumber || `订单-${order.id || Math.floor(Math.random() * 10000)}`,
-          totalAmount: order.totalAmount || order.total_amount || 0,
-          shipping_fee: order.shipping_fee || 0,
-          status: order.status || 'pending',
-          createTime: order.createTime || order.created_at || new Date().toISOString(),
-          items: order.items || []
-        }));
-      } catch (error) {
-        console.error('获取订单失败:', error)
-        // 出错时尝试使用store中的已有数据，避免显示空列表
-        let ordersData = [];
-        if (store.state.orders && Array.isArray(store.state.orders)) {
-          ordersData = store.state.orders;
-        } else if (store.state.orders && store.state.orders.orders) {
-          ordersData = store.state.orders.orders;
-        }
-        
-        orders.value = ordersData;
-        
-        // 确保数据完整性
-        orders.value = orders.value.map(order => ({
-          ...order,
-          id: order.id || Math.floor(Math.random() * 10000),
-          orderNumber: order.orderNumber || `订单-${order.id || Math.floor(Math.random() * 10000)}`,
-          totalAmount: order.totalAmount || order.total_amount || 0,
-          shipping_fee: order.shipping_fee || 0,
-          status: order.status || 'pending',
-          createTime: order.createTime || order.created_at || new Date().toISOString(),
-          items: order.items || []
-        }));
-      }
-    }
-
     onMounted(() => {
-      // 加载订单数据
-      fetchOrders()
+      // 模拟加载订单数据
+      orders.value = mockOrders
     })
 
     return {
